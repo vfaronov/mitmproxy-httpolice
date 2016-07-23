@@ -1,0 +1,5 @@
+*.pyc
+.cache
+.coverage
+htmlcov
+mitmproxy_HTTPolice.egg-info

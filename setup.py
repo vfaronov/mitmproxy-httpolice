@@ -20,7 +20,7 @@ setup(
     version=version,
     description='mitmproxy integration for HTTPolice',
     long_description=long_description,
-    url='https://github.com/vfaronov/httpolice',
+    url='https://github.com/vfaronov/mitmproxy-httpolice',
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
     license='MIT',
