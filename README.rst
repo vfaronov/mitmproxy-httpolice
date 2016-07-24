@@ -6,9 +6,8 @@ __ https://github.com/vfaronov/httpolice
 This package provides `mitmproxy`__ and `mitmdump`__ integration for HTTPolice.
 
 __ https://mitmproxy.org/
-__ http://docs.mitmproxy.org/en/latest/mitmdump.html
+__ http://docs.mitmproxy.org/en/stable/mitmdump.html
 
-See the “`mitmproxy integration`__” section in the `HTTPolice user manual`__.
+`Read the docs`__.
 
-__ http://pythonhosted.org/HTTPolice/mitmproxy.html
-__ http://pythonhosted.org/HTTPolice/
+__ http://mitmproxy-httpolice.readthedocs.io/
