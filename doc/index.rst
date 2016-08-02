@@ -62,3 +62,11 @@ You can use the ``-s`` option to :ref:`silence <silence>` unwanted notices,
 just as with the ``httpolice`` command-line tool::
 
   $ mitmdump -s "`python -m mitmproxy_httpolice` -s 1089 -s 1194 report.txt"
+
+mitmproxy/mitmdump itself has many interesting options.
+One of the more useful features is the ability to dump traffic into a file.
+If you do this, you can then “replay” it as many times as you wish::
+
+  $ mitmdump --wfile flows.dat
+  $ mitmdump --no-server --read-flows flows.dat \\
+  >     -s "`python -m mitmproxy_httpolice` /dev/stdout"
