@@ -1,0 +1,43 @@
+language: python
+
+python: "2.7"
+
+env:
+    - REQUIRES=minimum
+    - REQUIRES=normal
+
+install:
+    - if [ "$REQUIRES" = minimum ]; then tools/minimum_requires.sh; fi
+    - pip install -e .
+    - pip install -r tools/requirements.txt
+
+cache: pip
+
+script:
+    # Basic stuff.
+    - python setup.py check --strict --restructuredtext
+    - pylint *.py
+    - py.test
+
+    # Although the docs are processed by Read the Docs,
+    # we still want to check that they are building OK.
+    - sphinx-build -W doc/ doc/_build/
+
+    # Check the assorted reStructuredText documents at the top of the repo.
+    - tools/check_rst.sh
+
+    # Check that the source distribution includes everything it should,
+    # and nothing it shouldn't (including all the files we just built).
+    - check-manifest
+
+deploy:
+    on:
+        tags: true
+        # Only release from one of the environments.
+        python: "2.7"
+        condition: $REQUIRES = normal
+    provider: pypi
+    user: vfaronov
+    password:
+        secure: CJxSxCcPAebJP0YtRVg30ZuWNZYb7Y6WJVTDuH9c59NDqCpE6y1UfXFyj9zunM3pXrfxgvh+pVA4r4dzrI8n4+OBcqlWFfumZjDhYLM2luruKc+IxVf3mEw3p5v+77ssCkWHhmN7Auh/nIQMYtNp2p8TmO+yJA7Yd4oRnGNMPv/dEAKQlOGAYwI6i1rn+orknI+8q2cc7bmgeEUC97lMl9yhmF55aWycH+XGBVkFUiiu3/LLKzP2NG4YMTah7wFzclbPFqK4BK24Vwid0EXzQx1lEWmRyblo9msmeotD4qSCU4hwUYz5lZP4OCWkwqAA20xouK0tg17S3yq+glf4CQzEOCuCLa3r7VfgJW8ddfZ0J8rarVln8w+V22qsCvicTzRBZgEhwhZhQkHt5lOCwRJ62XgKJ6me9r+xlMYAy5QhDfj3KHUqV+om6Plj/nS/5AHduqTwRqd/mAOSIonMf/1ATYH7+Vk1HuHZPrKTqnbSrh4sdCqgWydgcVhbcF1nynxDwuG57znn6odLmMa90p/O2OdA+J2/1T4OL4akqmkf9mSZep/3nR/0fCN5AETDqdglWAG4EjNHWOnzgMsMKOyBkwn6bX0RCeXiVu13xNxalN4Od4s+//ErFkjJ70awI5Y55O+ZzUQ7ggBqhpvkRrLhL8zbDP4H+F38txAUqtw=
+    distributions: "sdist bdist_wheel"

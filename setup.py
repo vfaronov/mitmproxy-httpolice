@@ -14,6 +14,10 @@ with io.open(os.path.join('mitmproxy_httpolice.py')) as f:
 with io.open('README.rst') as f:
     long_description = f.read()
 
+with io.open('requirements.in') as f:
+    install_requires = [line for line in f
+                        if line and not line.startswith('#')]
+
 
 setup(
     name='mitmproxy-HTTPolice',
@@ -24,10 +28,7 @@ setup(
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
     license='MIT',
-    install_requires=[
-        'mitmproxy >=0.15',
-        'HTTPolice >=0.2.0',
-    ],
+    install_requires=install_requires,
     py_modules=['mitmproxy_httpolice'],
     classifiers=[
         'Intended Audience :: Developers',

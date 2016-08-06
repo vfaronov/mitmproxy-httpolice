@@ -1,0 +1,20 @@
+pip-tools
+check-manifest
+pylint
+pytest
+pytest-cov
+docutils
+wheel
+twine
+
+# mitmproxy 0.15 requires ``click >= 6.2, < 6.3``.
+# If we don't pin this down, we get a newer version of click and nothing works.
+# Eventually we will use pip-sync which will take care of this automatically.
+click == 6.2
+
+# Pin down the versions of Sphinx and Alabaster as used on Read the Docs
+# (you can see them in the generated page footers).
+# This will have to be checked and synchronized from time to time.
+# Not sure if good idea.
+Sphinx == 1.3.5
+alabaster == 0.7.8

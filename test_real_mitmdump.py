@@ -26,14 +26,10 @@ class RealMitmdump(object):
         os.close(fd)
         script_path = subprocess.check_output(['python', '-m',
                                                'mitmproxy_httpolice']).strip()
-        self.process = subprocess.Popen(
-            [
-                'mitmdump', '-p', str(self.port), '-s',
-                "'%s' '%s'" % (script_path, self.report_path)
-            ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        self.process = subprocess.Popen([
+            'mitmdump', '-p', str(self.port), '-s',
+            "'%s' '%s'" % (script_path, self.report_path)
+        ])
         time.sleep(2)       # Give it some time to get up and running
 
     # This whole thing is actually easier to do by hand

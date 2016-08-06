@@ -11,3 +11,7 @@ __ http://docs.mitmproxy.org/en/stable/mitmdump.html
 `Read the docs`__.
 
 __ http://mitmproxy-httpolice.readthedocs.io/
+
+Many details from the `main repo`__'s ``HACKING.rst`` apply here as well.
+
+__ https://github.com/vfaronov/django-httpolice
