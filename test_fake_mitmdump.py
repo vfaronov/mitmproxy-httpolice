@@ -139,12 +139,12 @@ def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
         )
 
     assert fake_mitmdump.report == (
-        b'------------ request 1 : POST /foo-bar?baz=qux\n'
+        b'------------ request: POST /foo-bar?baz=qux\n'
         b'E 1038 Bad JSON body\n' +
-        u'------------ response 1 : 201 Très bien\n'.encode('utf-8') +
+        u'------------ response: 201 Très bien\n'.encode('utf-8') +
         b'C 1073 Possibly missing Location header\n'
-        b'------------ request 2 : GET /\n'
-        b'------------ response 2 : 304 Not Modified\n'
+        b'------------ request: GET /\n'
+        b'------------ response: 304 Not Modified\n'
         b'C 1127 Content-Type in a 304 response\n'
     )
 
@@ -174,9 +174,9 @@ def test_http2(fake_mitmdump):          # pylint: disable=redefined-outer-name
             b'Hello world!\r\n'
         )
     assert fake_mitmdump.report == (
-        b'------------ request 1 : GET https://example.com/index.html\n'
+        b'------------ request: GET https://example.com/index.html\n'
         b'E 1000 Malformed if-match header\n'
-        b'------------ response 1 : 404 Not Found\n'
+        b'------------ response: 404 Not Found\n'
         b'E 1244 connection header in an HTTP/2 message\n'
     )
 
@@ -222,7 +222,7 @@ def test_silence(fake_mitmdump):         # pylint: disable=redefined-outer-name
             b''
         )
     assert fake_mitmdump.report == (
-        b'------------ request 1 : GET /\n'
-        b'------------ response 1 : 401 Unauthorized\n'
+        b'------------ request: GET /\n'
+        b'------------ response: 401 Unauthorized\n'
         b'C 1110 401 response with no Date header\n'
     )

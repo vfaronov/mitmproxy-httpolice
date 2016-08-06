@@ -100,11 +100,11 @@ def test_real(real_mitmdump):           # pylint: disable=redefined-outer-name
             b'Hello world!\r\n'
         )
     assert real_mitmdump.report == (
-        b'------------ request 1 : GET /response-headers?ETag=foobar\n'
+        b'------------ request: GET /response-headers?ETag=foobar\n'
         b'C 1070 No User-Agent header\n'
-        b'------------ response 1 : 200 OK\n'
+        b'------------ response: 200 OK\n'
         b'E 1000 Malformed ETag header\n'
-        b'------------ request 2 : OPTIONS *\n'
+        b'------------ request: OPTIONS *\n'
         b'C 1041 Body without Content-Type\n'
         b'E 1062 OPTIONS request with a body but no Content-Type\n'
     )
