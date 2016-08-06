@@ -16,6 +16,10 @@ __ http://docs.mitmproxy.org/en/stable/scripting/inlinescripts.html
 __ http://httpolice.readthedocs.io/en/stable/
 __ http://docs.mitmproxy.org/en/stable/mitmdump.html
 
+For recent changes in mitmproxy-HTTPolice, see the `changelog`__.
+
+__ https://github.com/vfaronov/mitmproxy-httpolice/blob/master/CHANGELOG.rst
+
 
 Installation
 ------------
