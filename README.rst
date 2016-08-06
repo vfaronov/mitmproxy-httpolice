@@ -14,4 +14,4 @@ __ http://mitmproxy-httpolice.readthedocs.io/
 
 Many details from the `main repo`__'s ``HACKING.rst`` apply here as well.
 
-__ https://github.com/vfaronov/django-httpolice
+__ https://github.com/vfaronov/httpolice
