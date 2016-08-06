@@ -7,7 +7,7 @@ import os
 import httpolice
 
 
-__version__ = '0.3.0.dev2'
+__version__ = '0.3.0.dev3'
 
 reports = {'text': httpolice.text_report, 'html': httpolice.html_report}
 
