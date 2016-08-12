@@ -30,6 +30,7 @@ setup(
     license='MIT',
     install_requires=install_requires,
     py_modules=['mitmproxy_httpolice'],
+    zip_safe=False,         # mitmproxy needs to read our module as a file
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
