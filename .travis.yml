@@ -44,4 +44,4 @@ deploy:
     # Travis insists on uploading the docs --
     # https://github.com/travis-ci/dpl/issues/334 --
     # but we can tell it to upload a stub instead of the actual docs.
-    docs_dir: pythonhosted.org
+    docs_dir: tools/pythonhosted.org
