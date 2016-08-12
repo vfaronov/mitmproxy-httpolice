@@ -72,5 +72,5 @@ One of the more useful features is the ability to dump traffic into a file.
 If you do this, you can then “replay” it as many times as you wish::
 
   $ mitmdump --wfile flows.dat
-  $ mitmdump --no-server --read-flows flows.dat \\
+  $ mitmdump --no-server --read-flows flows.dat \
   >     -s "`python -m mitmproxy_httpolice` /dev/stdout"
