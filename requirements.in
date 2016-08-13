@@ -1,2 +1,2 @@
 mitmproxy >= 0.15
-HTTPolice >= 0.3.0.dev3
+HTTPolice >= 0.3.0rc2
