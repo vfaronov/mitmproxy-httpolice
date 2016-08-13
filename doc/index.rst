@@ -34,6 +34,9 @@ see `mitmproxy docs`__ and `HTTPolice docs`__ for more detailed instructions.
 __ http://docs.mitmproxy.org/en/stable/install.html
 __ http://httpolice.readthedocs.io/en/stable/install.html
 
+Note that mitmproxy requires a specific version of Python
+(mitmproxy 0.17 requires Python 2.7).
+
 
 Usage
 -----
