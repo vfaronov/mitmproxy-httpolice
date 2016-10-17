@@ -12,37 +12,41 @@ __version__ = '0.4.0.dev1'
 reports = {'text': httpolice.text_report, 'html': httpolice.html_report}
 
 
-def start(context, argv):
+def start(argv=None):
     parser = argparse.ArgumentParser(prog=os.path.basename(__file__),
                                      add_help=False)
     parser.add_argument('-o', '--output', choices=reports, default='text')
     parser.add_argument('-s', '--silence', metavar='ID',
                         type=int, action='append')
     parser.add_argument('report_path')
-    context.args = parser.parse_args(argv[1:])
-
-    # Open the output file right now, because if it's wrong,
-    # we don't want to wait until the end and lose all collected data.
-    path = os.path.expanduser(context.args.report_path)
-    context.report_file = io.open(path, 'wb')
-
-    context.exchanges = []
+    args = parser.parse_args(argv)
+    return MitmproxyHTTPolice(args.report_path, args.output, args.silence)
 
 
-def response(context, flow):
-    req = construct_request(flow)
-    resp = construct_response(flow)
-    exch = httpolice.Exchange(req, [resp])
-    if context.args.silence:
-        exch.silence(context.args.silence)
-    httpolice.check_exchange(exch)
-    context.exchanges.append(exch)
+class MitmproxyHTTPolice(object):
 
+    def __init__(self, report_path, output_format, silence=None):
+        self.report_path = os.path.expanduser(report_path)
+        self.output_format = output_format
+        self.silence = silence or []
+        self.exchanges = []
 
-def done(context):
-    with context.report_file:
-        report = reports[context.args.output]
-        report(context.exchanges, context.report_file)
+        # Open the output file right now, because if it's wrong,
+        # we don't want to wait until the end and lose all collected data.
+        self.report_file = io.open(self.report_path, 'wb')
+
+    def response(self, flow):
+        req = construct_request(flow)
+        resp = construct_response(flow)
+        exch = httpolice.Exchange(req, [resp])
+        exch.silence(self.silence)
+        httpolice.check_exchange(exch)
+        self.exchanges.append(exch)
+
+    def done(self):
+        with self.report_file:
+            report = reports[self.output_format]
+            report(self.exchanges, self.report_file)
 
 
 def construct_request(flow):
@@ -50,12 +54,8 @@ def construct_request(flow):
     scheme = decode(flow.request.scheme)
     method = decode(flow.request.method)
 
-    # Contrary to mitmproxy's docs, `flow.request.path` will actually be "*"
-    # for asterisk-form requests in the tunnel (after CONNECT).
     # Authority-form and absolute-form requests in the tunnel
     # are simply rejected as errors by mitmproxy, closing the connection.
-    # As for `flow.request.first_line_format`,
-    # I couldn't get that to be anything other than "relative".
     target = decode(flow.request.path)
 
     if version == u'HTTP/2':
@@ -76,8 +76,6 @@ def construct_response(flow):
     reason = decode(flow.response.reason)
     if version == u'HTTP/2':
         httpolice.helpers.pop_pseudo_headers(headers)
-    if (100 <= status < 200) or status in [204, 304]:
-        headers = remove_content_length(headers, only_if=b'0')
     return httpolice.Response(version, status, reason, headers, body)
 
 
@@ -86,19 +84,8 @@ def extract_message_basics(msg):
     if version == u'HTTP/2.0':
         version = u'HTTP/2'
     headers = [(decode(k), v) for (k, v) in msg.headers.fields]
-    if any(k.lower() == u'transfer-encoding' for (k, v) in headers):
-        headers = remove_content_length(headers)
-    body = msg.content
+    body = msg.raw_content
     return version, headers, body
-
-
-def remove_content_length(headers, only_if=None):
-    # mitmproxy automatically adds a ``Content-Length`` header
-    # to messages that lack it.
-    # But some messages can't/shouldn't have a ``Content-Length`` at all.
-    return [(k, v)
-            for (k, v) in headers
-            if k.lower() != u'content-length' or (only_if and v != only_if)]
 
 
 def decode(s):

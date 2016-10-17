@@ -27,11 +27,10 @@ class FakeMitmdump(object):
         self.opts = []
 
     def start(self):
-        self.context = Bin()
         fd, self.report_path = tempfile.mkstemp()
         os.close(fd)
-        argv = [''] + self.opts + [self.report_path]
-        mitmproxy_httpolice.start(self.context, argv)
+        argv = self.opts + [self.report_path]
+        self.script_obj = mitmproxy_httpolice.start(argv)
 
     def flow(self,
              req_scheme, req_method, req_path, req_http_version,
@@ -46,18 +45,18 @@ class FakeMitmdump(object):
         flow.request.http_version = req_http_version
         flow.request.headers = Bin()
         flow.request.headers.fields = req_fields
-        flow.request.content = req_content
+        flow.request.raw_content = req_content
         flow.response = Bin()
         flow.response.http_version = resp_http_version
         flow.response.status_code = resp_status_code
         flow.response.reason = resp_reason
         flow.response.headers = Bin()
         flow.response.headers.fields = resp_fields
-        flow.response.content = resp_content
-        mitmproxy_httpolice.response(self.context, flow)
+        flow.response.raw_content = resp_content
+        self.script_obj.response(flow)
 
     def done(self):
-        mitmproxy_httpolice.done(self.context)
+        self.script_obj.done()
         with io.open(self.report_path, 'rb') as f:
             self.report = f.read()
 
@@ -107,7 +106,6 @@ def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
                 ('host', 'example.com'),
                 ('User-Agent', 'demo'),
                 ('Transfer-Encoding', 'chunked'),
-                ('content-length', '14'),
                 ('content-type', 'application/json'),
             ],
             b'{foo: "bar"}',
@@ -133,7 +131,6 @@ def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
             [
                 ('Content-Type', 'text/plain'),
                 ('Date', 'Tue, 03 May 2016 14:13:34 GMT'),
-                ('content-length', '0'),
             ],
             b''
         )

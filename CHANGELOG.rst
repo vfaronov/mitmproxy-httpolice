@@ -7,6 +7,12 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+This release is compatible with mitmproxy 0.18+, and **only** 0.18+
+(because mitmproxy 0.18 has a new, backward-incompatible API).
+
+
 0.3.0 - 2016-08-14
 ~~~~~~~~~~~~~~~~~~
 Technical release. No interesting changes.

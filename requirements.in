@@ -1,2 +1,2 @@
-mitmproxy >= 0.15
+mitmproxy >= 0.18.1
 HTTPolice >= 0.3.0
