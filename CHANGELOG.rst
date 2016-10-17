@@ -14,7 +14,4 @@ Technical release. No interesting changes.
 
 0.2.0 - 2016-05-08
 ~~~~~~~~~~~~~~~~~~
-
-Added
------
-- Initial release as a separate distribution.
+Initial release as a separate distribution.
