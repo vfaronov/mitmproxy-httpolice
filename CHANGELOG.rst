@@ -11,6 +11,7 @@ Unreleased
 ~~~~~~~~~~
 This release is compatible with mitmproxy 0.18+, and **only** 0.18+
 (because mitmproxy 0.18 has a new, backward-incompatible API).
+Note that mitmproxy (and thus mitmproxy-HTTPolice) now supports Python 3.
 
 
 0.3.0 - 2016-08-14

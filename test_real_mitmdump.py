@@ -24,8 +24,8 @@ class RealMitmdump(object):
     def start(self):
         fd, self.report_path = tempfile.mkstemp()
         os.close(fd)
-        script_path = subprocess.check_output(['python', '-m',
-                                               'mitmproxy_httpolice']).strip()
+        script_path = subprocess.check_output(
+            ['python', '-m', 'mitmproxy_httpolice']).decode().strip()
         self.process = subprocess.Popen([
             'mitmdump', '-p', str(self.port), '-s',
             "'%s' '%s'" % (script_path, self.report_path)
