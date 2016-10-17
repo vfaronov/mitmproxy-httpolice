@@ -7,8 +7,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
-Unreleased
-~~~~~~~~~~
+0.4.0 - 2016-10-17
+~~~~~~~~~~~~~~~~~~
 This release is compatible with mitmproxy 0.18+, and **only** 0.18+
 (because mitmproxy 0.18 has a new, backward-incompatible API).
 Note that mitmproxy (and thus mitmproxy-HTTPolice) now supports Python 3.5+.
