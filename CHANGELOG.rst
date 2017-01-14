@@ -7,6 +7,14 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+0.5.0 - 2017-01-14
+~~~~~~~~~~~~~~~~~~
+No interesting changes; just update docs and packaging
+for better compatibility with Python 3.6 and mitmproxy 1.0.
+This version also drops support for Python 2. If you need Python 2,
+use ``mitmproxy==0.18.2`` and ``mitmproxy-HTTPolice==0.4.0``.
+
+
 0.4.0 - 2016-10-17
 ~~~~~~~~~~~~~~~~~~
 This release is compatible with mitmproxy 0.18+, and **only** 0.18+
