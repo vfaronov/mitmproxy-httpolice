@@ -34,6 +34,13 @@ see `mitmproxy docs`__ and `HTTPolice docs`__ for more detailed instructions.
 __ http://docs.mitmproxy.org/en/stable/install.html
 __ http://httpolice.readthedocs.io/en/stable/install.html
 
+.. note::
+
+   **Do not use** mitmproxy’s pre-built self-contained binaries.
+   mitmproxy and HTTPolice need to live in the same Python environment,
+   and this is only possible if you install mitmproxy from source via pip.
+   See the “Installation from Source” sections in mitmproxy docs.
+
 
 Usage
 -----
