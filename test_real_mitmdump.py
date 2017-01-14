@@ -30,7 +30,7 @@ class RealMitmdump(object):
             'mitmdump', '-p', str(self.port), '-s',
             "'%s' '%s'" % (script_path, self.report_path)
         ])
-        time.sleep(2)       # Give it some time to get up and running
+        time.sleep(5)       # Give it some time to get up and running
 
     # This whole thing is actually easier to do by hand
     # than with either `httplib` or `urllib2`,
