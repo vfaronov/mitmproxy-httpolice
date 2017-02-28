@@ -65,7 +65,7 @@ def construct_request(flow):
         if authority and not has_host and target.startswith(u'/'):
             # Reconstruct HTTP/2's equivalent of
             # the "absolute form" of request target (RFC 7540 Section 8.1.2.3).
-            target = scheme + u'://' + authority + target
+            target = scheme + u'://' + decode(authority) + target
 
     return httpolice.Request(scheme, method, target, version, headers, body)
 

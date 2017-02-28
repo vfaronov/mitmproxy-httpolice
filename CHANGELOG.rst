@@ -7,6 +7,12 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+- Fixed an error that happened on many/most HTTP/2 requests
+  (those without a Host header).
+
+
 0.5.0 - 2017-01-14
 ~~~~~~~~~~~~~~~~~~
 No interesting changes; just update docs and packaging

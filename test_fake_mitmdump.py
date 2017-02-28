@@ -82,15 +82,15 @@ def test_simple(fake_mitmdump):         # pylint: disable=redefined-outer-name
             'http',
             'GET', '/', 'HTTP/1.1',
             [
-                ('host', 'example.com'),
-                ('User-Agent', 'demo'),
+                ('host', b'example.com'),
+                ('User-Agent', b'demo'),
             ],
             b'',
             'HTTP/1.1', 200, 'OK',
             [
-                ('Content-Type', 'text/plain'),
-                ('Content-Length', '14'),
-                ('Date', 'Tue, 03 May 2016 14:13:34 GMT'),
+                ('Content-Type', b'text/plain'),
+                ('Content-Length', b'14'),
+                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
             ],
             b'Hello world!\r\n'
         )
@@ -103,17 +103,17 @@ def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
             'http',
             'POST', '/foo-bar?baz=qux', 'HTTP/1.1',
             [
-                ('host', 'example.com'),
-                ('User-Agent', 'demo'),
-                ('Transfer-Encoding', 'chunked'),
-                ('content-type', 'application/json'),
+                ('host', b'example.com'),
+                ('User-Agent', b'demo'),
+                ('Transfer-Encoding', b'chunked'),
+                ('content-type', b'application/json'),
             ],
             b'{foo: "bar"}',
             'HTTP/1.1', 201, u'Très bien'.encode('iso-8859-1'),
             [
-                ('Content-Type', 'text/plain'),
-                ('Content-Length', '14'),
-                ('Date', 'Tue, 03 May 2016 14:13:34 GMT'),
+                ('Content-Type', b'text/plain'),
+                ('Content-Length', b'14'),
+                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
             ],
             b'Hello world!\r\n'
         )
@@ -122,15 +122,15 @@ def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
             'http',
             'GET', '/', 'HTTP/1.1',
             [
-                ('host', 'example.com'),
-                ('User-Agent', 'demo'),
-                ('If-None-Match', '"quux"'),
+                ('host', b'example.com'),
+                ('User-Agent', b'demo'),
+                ('If-None-Match', b'"quux"'),
             ],
             b'',
             'HTTP/1.1', 304, 'Not Modified',
             [
-                ('Content-Type', 'text/plain'),
-                ('Date', 'Tue, 03 May 2016 14:13:34 GMT'),
+                ('Content-Type', b'text/plain'),
+                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
             ],
             b''
         )
@@ -152,21 +152,21 @@ def test_http2(fake_mitmdump):          # pylint: disable=redefined-outer-name
             'https',
             'GET', '/index.html', 'HTTP/2.0',
             [
-                (':method', 'GET'),
-                (':scheme', 'https'),
-                (':authority', 'example.com'),
-                (':path', '/index.html'),
-                ('user-agent', 'demo'),
-                ('if-match', 'quux'),
+                (':method', b'GET'),
+                (':scheme', b'https'),
+                (':authority', b'example.com'),
+                (':path', b'/index.html'),
+                ('user-agent', b'demo'),
+                ('if-match', b'quux'),
             ],
             b'',
             'HTTP/2.0', 404, None,
             [
-                (':status', '404'),
-                ('content-type', 'text/plain'),
-                ('content-length', '14'),
-                ('date', 'Tue, 03 May 2016 14:13:34 GMT'),
-                ('connection', 'close'),
+                (':status', b'404'),
+                ('content-type', b'text/plain'),
+                ('content-length', b'14'),
+                ('date', b'Tue, 03 May 2016 14:13:34 GMT'),
+                ('connection', b'close'),
             ],
             b'Hello world!\r\n'
         )
@@ -185,15 +185,15 @@ def test_html(fake_mitmdump):           # pylint: disable=redefined-outer-name
             'http',
             'GET', '/', 'HTTP/1.1',
             [
-                ('host', 'example.com'),
-                ('User-Agent', 'demo'),
+                ('host', b'example.com'),
+                ('User-Agent', b'demo'),
             ],
             b'',
             'HTTP/1.1', 200, 'OK',
             [
-                ('Content-Type', 'text/plain'),
-                ('Content-Length', '14'),
-                ('Date', 'Tue, 03 May 2016 14:13:34 GMT'),
+                ('Content-Type', b'text/plain'),
+                ('Content-Length', b'14'),
+                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
             ],
             b'Hello world!\r\n'
         )
@@ -207,14 +207,14 @@ def test_silence(fake_mitmdump):         # pylint: disable=redefined-outer-name
             'http',
             'GET', '/', 'HTTP/1.1',
             [
-                ('host', 'example.com'),
-                ('User-Agent', 'demo'),
+                ('host', b'example.com'),
+                ('User-Agent', b'demo'),
             ],
             b'',
             'HTTP/1.1', 401, 'Unauthorized',
             [
-                ('Content-Type', 'text/plain'),
-                ('Content-Length', '0'),
+                ('Content-Type', b'text/plain'),
+                ('Content-Length', b'0'),
             ],
             b''
         )
