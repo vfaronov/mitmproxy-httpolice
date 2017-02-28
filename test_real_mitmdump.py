@@ -22,13 +22,16 @@ class RealMitmdump(object):
         self.port = random.randint(1024, 65535)
 
     def start(self):
+        config_path = os.path.join(
+            os.path.dirname(__file__), 'tools', 'mitmproxy-config')
         fd, self.report_path = tempfile.mkstemp()
         os.close(fd)
         script_path = subprocess.check_output(
             ['python3', '-m', 'mitmproxy_httpolice']).decode().strip()
         self.process = subprocess.Popen([
-            'mitmdump', '-p', str(self.port), '-s',
-            "'%s' '%s'" % (script_path, self.report_path)
+            'mitmdump', '--conf', config_path,
+            '-p', str(self.port),
+            '-s', "'%s' '%s'" % (script_path, self.report_path)
         ])
         time.sleep(5)       # Give it some time to get up and running
 
