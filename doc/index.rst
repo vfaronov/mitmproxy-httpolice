@@ -10,11 +10,12 @@ __ https://mitmproxy.org/
 
 mitmproxy-HTTPolice is a `script for mitmproxy`__
 that will check intercepted exchanges and produce an `HTTPolice`__ report.
-It also works with mitmproxy’s command-line tool `mitmdump`__.
+It also works with mitmproxy’s companion tools `mitmdump`__ and `mitmweb`__.
 
 __ http://docs.mitmproxy.org/en/stable/scripting/overview.html
 __ http://httpolice.readthedocs.io/en/stable/
 __ http://docs.mitmproxy.org/en/stable/mitmdump.html
+__ http://docs.mitmproxy.org/en/stable/mitmweb.html
 
 For recent changes in mitmproxy-HTTPolice, see the `changelog`__.
 
@@ -49,7 +50,7 @@ To run HTTPolice together with mitmproxy, use a command like this::
   $ mitmdump -s "`python3 -m mitmproxy_httpolice` -o html report.html"
 
 Note the backticks.
-Also, you can replace ``mitmdump`` with ``mitmproxy`` if you wish.
+Replace ``mitmdump`` with ``mitmproxy`` or ``mitmweb`` as needed.
 
 ``-s`` is an option for mitmproxy that specifies a script to run,
 along with arguments to that script.
@@ -64,7 +65,7 @@ that prints the path to the script file::
 (omit it if you want a plain text report).
 Finally, ``report.html`` is the name of the output file.
 
-Now, mitmproxy/mitmdump starts up as usual.
+Now, mitmproxy starts up as usual.
 Every exchange that it intercepts is checked by HTTPolice.
 When you stop mitmdump (Ctrl+C) or exit mitmproxy,
 HTTPolice writes an HTML report to ``report.html``.
@@ -74,7 +75,7 @@ just as with the ``httpolice`` command-line tool::
 
   $ mitmdump -s "`python3 -m mitmproxy_httpolice` -s 1089 -s 1194 report.txt"
 
-mitmproxy/mitmdump itself has many interesting options.
+mitmproxy itself has many interesting options.
 One of the more useful features is the ability to dump traffic into a file.
 If you do this, you can then “replay” it as many times as you wish::
 

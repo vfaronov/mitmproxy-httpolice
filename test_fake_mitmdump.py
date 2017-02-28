@@ -1,7 +1,7 @@
 # -*- coding: utf-8; -*-
 
 """
-Because only mitmproxy/mitmdump calls our script, not the other way around,
+Because only mitmproxy calls our script, not the other way around,
 we can imitate mitmproxy's calls and collect the results.
 """
 
