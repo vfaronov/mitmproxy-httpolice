@@ -22,7 +22,7 @@ script:
     # Basic stuff.
     - python setup.py check --strict --restructuredtext
     - pylint *.py
-    - py.test
+    - pytest
 
     # Although the docs are processed by Read the Docs,
     # we still want to check that they are building OK.
