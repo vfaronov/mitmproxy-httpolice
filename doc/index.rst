@@ -8,11 +8,11 @@ that can intercept TLS-encrypted connections, supports HTTP/2, and many more.
 
 __ https://mitmproxy.org/
 
-mitmproxy-HTTPolice is an `inline script`__ for mitmproxy
+mitmproxy-HTTPolice is a `script for mitmproxy`__
 that will check intercepted exchanges and produce an `HTTPolice`__ report.
 It also works with mitmproxy’s command-line tool `mitmdump`__.
 
-__ http://docs.mitmproxy.org/en/stable/scripting/inlinescripts.html
+__ http://docs.mitmproxy.org/en/stable/scripting/overview.html
 __ http://httpolice.readthedocs.io/en/stable/
 __ http://docs.mitmproxy.org/en/stable/mitmdump.html
 
@@ -51,7 +51,7 @@ To run HTTPolice together with mitmproxy, use a command like this::
 Note the backticks.
 Also, you can replace ``mitmdump`` with ``mitmproxy`` if you wish.
 
-``-s`` is an option for mitmproxy that specifies an inline script to run,
+``-s`` is an option for mitmproxy that specifies a script to run,
 along with arguments to that script.
 
 ``python3 -m mitmproxy_httpolice`` is a sub-command
