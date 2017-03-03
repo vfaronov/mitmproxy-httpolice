@@ -167,9 +167,9 @@ def test_html(bench):           # pylint: disable=redefined-outer-name
         bench.flow(
             tutils.treq(
                 scheme='http', host='example.com', port=80,
-                method='GET', path='/', http_version='HTTP/1.1',
+                method='GET', path=('/foo/bar' * 30), http_version='HTTP/1.1',
                 headers=Headers([(b'host', b'example.com'),
-                                 (b'User-Agent', b'demo')]),
+                                 (b'User-Agent', b'Java')]),
                 content=b'',
             ),
             tutils.tresp(

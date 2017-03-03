@@ -1,9 +1,11 @@
 # -*- coding: utf-8; -*-
 
 import argparse
+import collections
 import io
 import os
 
+import mitmproxy.ctx
 import httpolice
 
 
@@ -42,6 +44,7 @@ class MitmproxyHTTPolice(object):
         exch.silence(self.silence)
         httpolice.check_exchange(exch)
         self.exchanges.append(exch)
+        log_exchange(exch, flow)
 
     def done(self):
         with self.report_file:
@@ -88,9 +91,35 @@ def extract_message_basics(msg):
     return version, headers, body
 
 
+def log_exchange(exch, flow):
+    severities = collections.Counter(notice.severity
+                                     for msg in [exch.request] + exch.responses
+                                     for notice in msg.notices)
+    pieces = ['%d %ss' % (n, severity.name)
+              for (severity, n) in sorted(severities.items(), reverse=True)
+              if severity > httpolice.Severity.debug]
+    if pieces:
+        log_func = (mitmproxy.ctx.log.warn
+                    if max(severities) >= httpolice.Severity.error
+                    else mitmproxy.ctx.log.info)
+        log_func('HTTPolice found %s in: %s %s - %d %s' % (
+            ', '.join(pieces),
+            flow.request.method, ellipsize(flow.request.path),
+            flow.response.status_code, ellipsize(flow.response.reason),
+        ))
+
+
 def decode(s):
     if isinstance(s, bytes):
         return s.decode('iso-8859-1')
+    else:
+        return s
+
+
+def ellipsize(s, max_length=40):
+    if len(s) > max_length:
+        ellipsis = u'...'
+        return s[:(max_length - len(ellipsis))] + ellipsis
     else:
         return s
 
