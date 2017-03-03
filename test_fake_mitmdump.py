@@ -1,30 +1,25 @@
 # -*- coding: utf-8; -*-
-
-"""
-Because only mitmproxy calls our script, not the other way around,
-we can imitate mitmproxy's calls and collect the results.
-"""
+# pylint: disable=no-name-in-module,import-error
 
 import io
 import os
 import tempfile
 
+from mitmproxy.net.http import Headers
+from mitmproxy.test import taddons, tflow, tutils
 import pytest
 
 import mitmproxy_httpolice
 
 
-class Bin(object):
-
-    pass
-
-
-class FakeMitmdump(object):
-
-    # pylint: disable=attribute-defined-outside-init
+class Bench:
 
     def __init__(self):
         self.opts = []
+        self.context = taddons.context()
+        self.report_path = None
+        self.script_obj = None
+        self.report = None
 
     def start(self):
         fd, self.report_path = tempfile.mkstemp()
@@ -32,28 +27,8 @@ class FakeMitmdump(object):
         argv = self.opts + [self.report_path]
         self.script_obj = mitmproxy_httpolice.start(argv)
 
-    def flow(self,
-             req_scheme, req_method, req_path, req_http_version,
-             req_fields, req_content,
-             resp_http_version, resp_status_code, resp_reason,
-             resp_fields, resp_content):
-        flow = Bin()
-        flow.request = Bin()
-        flow.request.scheme = req_scheme
-        flow.request.method = req_method
-        flow.request.path = req_path
-        flow.request.http_version = req_http_version
-        flow.request.headers = Bin()
-        flow.request.headers.fields = req_fields
-        flow.request.raw_content = req_content
-        flow.response = Bin()
-        flow.response.http_version = resp_http_version
-        flow.response.status_code = resp_status_code
-        flow.response.reason = resp_reason
-        flow.response.headers = Bin()
-        flow.response.headers.fields = resp_fields
-        flow.response.raw_content = resp_content
-        self.script_obj.response(flow)
+    def flow(self, req, resp):
+        self.script_obj.response(tflow.tflow(req=req, resp=resp))
 
     def done(self):
         self.script_obj.done()
@@ -61,81 +36,89 @@ class FakeMitmdump(object):
             self.report = f.read()
 
     def __enter__(self):
+        self.context.__enter__()
         self.start()
         return self
 
-    def __exit__(self, exc_type, _exc_value, _traceback):
+    def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             self.done()
+        self.context.__exit__(exc_type, exc_value, traceback)
         if os.path.exists(self.report_path):
             os.unlink(self.report_path)
 
 
 @pytest.fixture
-def fake_mitmdump(request):                 # pylint: disable=unused-argument
-    return FakeMitmdump()
+def bench(request):                     # pylint: disable=unused-argument
+    return Bench()
 
 
-def test_simple(fake_mitmdump):         # pylint: disable=redefined-outer-name
-    with fake_mitmdump:
-        fake_mitmdump.flow(
-            'http',
-            'GET', '/', 'HTTP/1.1',
-            [
-                ('host', b'example.com'),
-                ('User-Agent', b'demo'),
-            ],
-            b'',
-            'HTTP/1.1', 200, 'OK',
-            [
-                ('Content-Type', b'text/plain'),
-                ('Content-Length', b'14'),
-                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
-            ],
-            b'Hello world!\r\n'
+def test_simple(bench):                 # pylint: disable=redefined-outer-name
+    with bench:
+        bench.flow(
+            tutils.treq(
+                scheme='http', host='example.com', port=80,
+                method='GET', path='/', http_version='HTTP/1.1',
+                headers=Headers([(b'host', b'example.com'),
+                                 (b'User-Agent', b'demo')]),
+                content=b'',
+            ),
+            tutils.tresp(
+                http_version='HTTP/1.1', status_code=200, reason='OK',
+                headers=Headers([
+                    (b'Content-Type', b'text/plain'),
+                    (b'Content-Length', b'14'),
+                    (b'Date', b'Tue, 03 May 2016 14:13:34 GMT'),
+                ]),
+                content=b'Hello world!\r\n',
+            ),
         )
-    assert fake_mitmdump.report == b''
+    assert bench.report == b''
 
 
-def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
-    with fake_mitmdump:
-        fake_mitmdump.flow(
-            'http',
-            'POST', '/foo-bar?baz=qux', 'HTTP/1.1',
-            [
-                ('host', b'example.com'),
-                ('User-Agent', b'demo'),
-                ('Transfer-Encoding', b'chunked'),
-                ('content-type', b'application/json'),
-            ],
-            b'{foo: "bar"}',
-            'HTTP/1.1', 201, u'Très bien'.encode('iso-8859-1'),
-            [
-                ('Content-Type', b'text/plain'),
-                ('Content-Length', b'14'),
-                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
-            ],
-            b'Hello world!\r\n'
+def test_complex(bench):               # pylint: disable=redefined-outer-name
+    with bench:
+        bench.flow(
+            tutils.treq(
+                scheme='http', host='example.com', port=80,
+                method='POST', path='/foo-bar?baz=qux',
+                http_version='HTTP/1.1',
+                headers=Headers([(b'host', b'example.com'),
+                                 (b'User-Agent', b'demo'),
+                                 (b'Transfer-Encoding', b'chunked'),
+                                 (b'content-type', b'application/json')]),
+                content=b'{foo: "bar"}',
+            ),
+            tutils.tresp(
+                http_version='HTTP/1.1',  status_code=201,
+                # Not sure why mitmproxy wants me to encode this as UTF-8
+                # rather than ISO-8859-1, but so long as it works...
+                reason=u'Très bien'.encode('utf-8'),
+                headers=Headers([(b'Content-Type', b'text/plain'),
+                                 (b'Content-Length', b'14'),
+                                 (b'Date', b'Tue, 03 May 2016 14:13:34 GMT')]),
+                content=b'Hello world!\r\n',
+            ),
+        )
+        bench.flow(
+            tutils.treq(
+                scheme='http', host='example.com', port=80,
+                method='GET', path='/', http_version='HTTP/1.1',
+                headers=Headers([(b'host', b'example.com'),
+                                 (b'User-Agent', b'demo'),
+                                 (b'If-None-Match', b'"quux"')]),
+                content=b'',
+            ),
+            tutils.tresp(
+                http_version='HTTP/1.1',
+                status_code=304, reason='Not Modified',
+                headers=Headers([(b'Content-Type', b'text/plain'),
+                                 (b'Date', b'Tue, 03 May 2016 14:13:34 GMT')]),
+                content=b'',
+            ),
         )
 
-        fake_mitmdump.flow(
-            'http',
-            'GET', '/', 'HTTP/1.1',
-            [
-                ('host', b'example.com'),
-                ('User-Agent', b'demo'),
-                ('If-None-Match', b'"quux"'),
-            ],
-            b'',
-            'HTTP/1.1', 304, 'Not Modified',
-            [
-                ('Content-Type', b'text/plain'),
-                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
-            ],
-            b''
-        )
-
-    assert fake_mitmdump.report == (
+    assert bench.report == (
         b'------------ request: POST /foo-bar?baz=qux\n'
         b'E 1038 Bad JSON body\n' +
         u'------------ response: 201 Très bien\n'.encode('utf-8') +
@@ -146,31 +129,31 @@ def test_complex(fake_mitmdump):        # pylint: disable=redefined-outer-name
     )
 
 
-def test_http2(fake_mitmdump):          # pylint: disable=redefined-outer-name
-    with fake_mitmdump:
-        fake_mitmdump.flow(
-            'https',
-            'GET', '/index.html', 'HTTP/2.0',
-            [
-                (':method', b'GET'),
-                (':scheme', b'https'),
-                (':authority', b'example.com'),
-                (':path', b'/index.html'),
-                ('user-agent', b'demo'),
-                ('if-match', b'quux'),
-            ],
-            b'',
-            'HTTP/2.0', 404, None,
-            [
-                (':status', b'404'),
-                ('content-type', b'text/plain'),
-                ('content-length', b'14'),
-                ('date', b'Tue, 03 May 2016 14:13:34 GMT'),
-                ('connection', b'close'),
-            ],
-            b'Hello world!\r\n'
+def test_http2(bench):          # pylint: disable=redefined-outer-name
+    with bench:
+        bench.flow(
+            tutils.treq(
+                scheme='https', host='example.com', port=443,
+                method='GET', path='/index.html', http_version='HTTP/2.0',
+                headers=Headers([(b':method', b'GET'),
+                                 (b':scheme', b'https'),
+                                 (b':authority', b'example.com'),
+                                 (b':path', b'/index.html'),
+                                 (b'user-agent', b'demo'),
+                                 (b'if-match', b'quux')]),
+                content=b'',
+            ),
+            tutils.tresp(
+                http_version='HTTP/2.0', status_code=404, reason='',
+                headers=Headers([(b':status', b'404'),
+                                 (b'content-type', b'text/plain'),
+                                 (b'content-length', b'14'),
+                                 (b'date', b'Tue, 03 May 2016 14:13:34 GMT'),
+                                 (b'connection', b'close')]),
+                content=b'Hello world!\r\n',
+            ),
         )
-    assert fake_mitmdump.report == (
+    assert bench.report == (
         b'------------ request: GET https://example.com/index.html\n'
         b'E 1000 Malformed if-match header\n'
         b'------------ response: 404 Not Found\n'
@@ -178,47 +161,50 @@ def test_http2(fake_mitmdump):          # pylint: disable=redefined-outer-name
     )
 
 
-def test_html(fake_mitmdump):           # pylint: disable=redefined-outer-name
-    fake_mitmdump.opts = ['-o', 'html']
-    with fake_mitmdump:
-        fake_mitmdump.flow(
-            'http',
-            'GET', '/', 'HTTP/1.1',
-            [
-                ('host', b'example.com'),
-                ('User-Agent', b'demo'),
-            ],
-            b'',
-            'HTTP/1.1', 200, 'OK',
-            [
-                ('Content-Type', b'text/plain'),
-                ('Content-Length', b'14'),
-                ('Date', b'Tue, 03 May 2016 14:13:34 GMT'),
-            ],
-            b'Hello world!\r\n'
+def test_html(bench):           # pylint: disable=redefined-outer-name
+    bench.opts = ['-o', 'html']
+    with bench:
+        bench.flow(
+            tutils.treq(
+                scheme='http', host='example.com', port=80,
+                method='GET', path='/', http_version='HTTP/1.1',
+                headers=Headers([(b'host', b'example.com'),
+                                 (b'User-Agent', b'demo')]),
+                content=b'',
+            ),
+            tutils.tresp(
+                http_version='HTTP/1.1', status_code=200, reason='OK',
+                headers=Headers([
+                    (b'Content-Type', b'text/plain'),
+                    (b'Content-Length', b'14'),
+                    (b'Date', b'Tue, 03 May 2016 14:13:34 GMT'),
+                ]),
+                content=b'Hello world!\r\n',
+            ),
         )
-    assert b'<h1>HTTPolice report</h1>' in fake_mitmdump.report
+    assert b'<h1>HTTPolice report</h1>' in bench.report
 
 
-def test_silence(fake_mitmdump):         # pylint: disable=redefined-outer-name
-    fake_mitmdump.opts = ['-s', '1087', '-s', '1194']
-    with fake_mitmdump:
-        fake_mitmdump.flow(
-            'http',
-            'GET', '/', 'HTTP/1.1',
-            [
-                ('host', b'example.com'),
-                ('User-Agent', b'demo'),
-            ],
-            b'',
-            'HTTP/1.1', 401, 'Unauthorized',
-            [
-                ('Content-Type', b'text/plain'),
-                ('Content-Length', b'0'),
-            ],
-            b''
+def test_silence(bench):         # pylint: disable=redefined-outer-name
+    bench.opts = ['-s', '1087', '-s', '1194']
+    with bench:
+        bench.flow(
+            tutils.treq(
+                scheme='http', host='example.com', port=80,
+                method='GET', path='/', http_version='HTTP/1.1',
+                headers=Headers([(b'host', b'example.com'),
+                                 (b'User-Agent', b'demo')]),
+                content=b'',
+            ),
+            tutils.tresp(
+                http_version='HTTP/1.1',
+                status_code=401, reason='Unauthorized',
+                headers=Headers([(b'Content-Type', b'text/plain'),
+                                 (b'Content-Length', b'0')]),
+                content=b'',
+            ),
         )
-    assert fake_mitmdump.report == (
+    assert bench.report == (
         b'------------ request: GET /\n'
         b'------------ response: 401 Unauthorized\n'
         b'C 1110 401 response with no Date header\n'
