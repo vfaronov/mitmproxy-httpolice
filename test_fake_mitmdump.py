@@ -90,10 +90,7 @@ def test_complex(bench):               # pylint: disable=redefined-outer-name
                 content=b'{foo: "bar"}',
             ),
             tutils.tresp(
-                http_version='HTTP/1.1',  status_code=201,
-                # Not sure why mitmproxy wants me to encode this as UTF-8
-                # rather than ISO-8859-1, but so long as it works...
-                reason=u'Très bien'.encode('utf-8'),
+                http_version='HTTP/1.1',  status_code=201, reason=u'Created',
                 headers=Headers([(b'Content-Type', b'text/plain'),
                                  (b'Content-Length', b'14'),
                                  (b'Date', b'Tue, 03 May 2016 14:13:34 GMT')]),
@@ -121,7 +118,7 @@ def test_complex(bench):               # pylint: disable=redefined-outer-name
     assert bench.report == (
         b'------------ request: POST /foo-bar?baz=qux\n'
         b'E 1038 Bad JSON body\n' +
-        u'------------ response: 201 Très bien\n'.encode('utf-8') +
+        b'------------ response: 201 Created\n' +
         b'C 1073 Possibly missing Location header\n'
         b'------------ request: GET /\n'
         b'------------ response: 304 Not Modified\n'
