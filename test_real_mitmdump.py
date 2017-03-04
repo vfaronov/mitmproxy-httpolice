@@ -82,13 +82,23 @@ def real_mitmdump(request):                  # pylint: disable=unused-argument
     return RealMitmdump()
 
 
-def test_real(real_mitmdump):           # pylint: disable=redefined-outer-name
+def test_http11_proxy(real_mitmdump):    # pylint: disable=redefined-outer-name
     with real_mitmdump:
         real_mitmdump.send_request(
             b'GET http://httpbin.org/response-headers?ETag=foobar HTTP/1.1\r\n'
             b'Host: httpbin.org\r\n'
             b'\r\n'
         )
+    assert real_mitmdump.report == (
+        b'------------ request: GET /response-headers?ETag=foobar\n'
+        b'C 1070 No User-Agent header\n'
+        b'------------ response: 200 OK\n'
+        b'E 1000 Malformed ETag header\n'
+    )
+
+
+def test_http11_tunnel(real_mitmdump):  # pylint: disable=redefined-outer-name
+    with real_mitmdump:
         real_mitmdump.send_tunneled_request(
             'httpd.apache.org', 443,
             b'OPTIONS * HTTP/1.1\r\n'
@@ -99,10 +109,6 @@ def test_real(real_mitmdump):           # pylint: disable=redefined-outer-name
             b'Hello world!\r\n'
         )
     assert real_mitmdump.report == (
-        b'------------ request: GET /response-headers?ETag=foobar\n'
-        b'C 1070 No User-Agent header\n'
-        b'------------ response: 200 OK\n'
-        b'E 1000 Malformed ETag header\n'
         b'------------ request: OPTIONS *\n'
         b'C 1041 Body without Content-Type\n'
         b'E 1062 OPTIONS request with a body but no Content-Type\n'
