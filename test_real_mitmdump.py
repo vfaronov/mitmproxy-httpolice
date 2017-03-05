@@ -1,4 +1,5 @@
 # -*- coding: utf-8; -*-
+# pylint: disable=redefined-outer-name
 
 """Spin up an actual mitmdump process and run a few requests through it."""
 
@@ -86,7 +87,7 @@ def real_mitmdump(request):                  # pylint: disable=unused-argument
     return RealMitmdump()
 
 
-def test_http11_proxy(real_mitmdump):    # pylint: disable=redefined-outer-name
+def test_http11_proxy(real_mitmdump):
     with real_mitmdump:
         real_mitmdump.send_request(
             b'GET http://httpbin.org/response-headers?ETag=foobar HTTP/1.1\r\n'
@@ -101,7 +102,7 @@ def test_http11_proxy(real_mitmdump):    # pylint: disable=redefined-outer-name
     )
 
 
-def test_http11_tunnel(real_mitmdump):  # pylint: disable=redefined-outer-name
+def test_http11_tunnel(real_mitmdump):
     with real_mitmdump:
         real_mitmdump.send_tunneled_request(
             'httpd.apache.org', 443,
@@ -121,7 +122,7 @@ def test_http11_tunnel(real_mitmdump):  # pylint: disable=redefined-outer-name
 
 @pytest.mark.skipif(ssl.OPENSSL_VERSION_INFO < (1, 0, 2),
                     reason='HTTP/2 needs ALPN, which needs OpenSSL 1.0.2+')
-def test_http2_reverse(real_mitmdump):   # pylint: disable=redefined-outer-name
+def test_http2_reverse(real_mitmdump):      # pragma: no cover
     # A TLS context that does not verify certificates.
     context = hyper.tls.init_context()
     context.check_hostname = False
