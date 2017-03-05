@@ -11,6 +11,8 @@ import subprocess
 import tempfile
 import time
 
+import hyper
+import hyper.tls
 import pytest
 
 
@@ -18,8 +20,11 @@ class RealMitmdump(object):
 
     # pylint: disable=attribute-defined-outside-init
 
+    host = 'localhost'
+
     def __init__(self):
         self.port = random.randint(1024, 65535)
+        self.extra_options = []
 
     def start(self):
         config_path = os.path.join(
@@ -28,11 +33,10 @@ class RealMitmdump(object):
         os.close(fd)
         script_path = subprocess.check_output(
             ['python3', '-m', 'mitmproxy_httpolice']).decode().strip()
-        self.process = subprocess.Popen([
-            'mitmdump', '--conf', config_path,
-            '-p', str(self.port),
-            '-s', "'%s' '%s'" % (script_path, self.report_path)
-        ])
+        args = (['--conf', config_path, '-p', str(self.port)] +
+                self.extra_options +
+                ['-s', "'%s' '%s'" % (script_path, self.report_path)])
+        self.process = subprocess.Popen(['mitmdump'] + args)
         time.sleep(5)       # Give it some time to get up and running
 
     # This whole thing is actually easier to do by hand
@@ -49,7 +53,7 @@ class RealMitmdump(object):
     def send_tunneled_request(self, host, port, data):
         # We need our own TLS context that does not verify certificates.
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        sock = socket.create_connection(('localhost', self.port))
+        sock = socket.create_connection((self.host, self.port))
         connect = (u'CONNECT {0}:{1} HTTP/1.1\r\n'
                    u'Host: {0}\r\n'
                    u'\r\n'.format(host, port))
@@ -113,3 +117,25 @@ def test_http11_tunnel(real_mitmdump):  # pylint: disable=redefined-outer-name
         b'C 1041 Body without Content-Type\n'
         b'E 1062 OPTIONS request with a body but no Content-Type\n'
     )
+
+
+def test_http2_reverse(real_mitmdump):   # pylint: disable=redefined-outer-name
+    # A TLS context that does not verify certificates.
+    context = hyper.tls.init_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+
+    real_mitmdump.extra_options = ['--reverse', 'https://nghttp2.org']
+    with real_mitmdump:
+        conn = hyper.HTTPConnection(real_mitmdump.host, real_mitmdump.port,
+                                    secure=True, ssl_context=context,
+                                    enable_push=True)
+        conn.request('GET', '/')
+        conn.get_response()
+        # Wait for the ``PUSH_PROMISE``.
+        time.sleep(3)
+
+    # nghttp2.org currently has some problems that we can't rely on
+    # (notices 1277 and 1109), so we check only specific things.
+    assert (b'------------ request: GET https://nghttp2.org/\n'
+            b'C 1070 No User-Agent header\n') in real_mitmdump.report
