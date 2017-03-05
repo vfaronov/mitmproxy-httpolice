@@ -119,6 +119,8 @@ def test_http11_tunnel(real_mitmdump):  # pylint: disable=redefined-outer-name
     )
 
 
+@pytest.mark.skipif(ssl.OPENSSL_VERSION_INFO < (1, 0, 2),
+                    reason='HTTP/2 needs ALPN, which needs OpenSSL 1.0.2+')
 def test_http2_reverse(real_mitmdump):   # pylint: disable=redefined-outer-name
     # A TLS context that does not verify certificates.
     context = hyper.tls.init_context()
