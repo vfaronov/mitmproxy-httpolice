@@ -99,8 +99,8 @@ def attach_report(exch, flow):
         report = buf.getvalue().decode('utf-8')
         # It would be nicer to split this into separate metadata entries
         # for request and response, but since `flow.metadata` is a plain dict,
-        # their order is random under Python 3.5 and sometimes response comes
-        # after request. Also wrap in ``try...except`` because `flow.metadata`
+        # their order is random under Python 3.5 and sometimes request comes
+        # after response. Also wrap in ``try...except`` because `flow.metadata`
         # is not public API yet.
         try:
             flow.metadata['HTTPolice report'] = ReprString(report)
@@ -109,6 +109,7 @@ def attach_report(exch, flow):
 
 
 def log_exchange(exch, flow):
+    # Produce lines like "1 errors, 2 warnings" without hardcoding severities.
     severities = collections.Counter(notice.severity
                                      for msg in [exch.request] + exch.responses
                                      for notice in msg.notices)
