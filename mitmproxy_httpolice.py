@@ -44,6 +44,7 @@ class MitmproxyHTTPolice(object):
         exch.silence(self.silence)
         httpolice.check_exchange(exch)
         self.exchanges.append(exch)
+        attach_report(exch, flow)
         log_exchange(exch, flow)
 
     def done(self):
@@ -91,6 +92,22 @@ def extract_message_basics(msg):
     return version, headers, body
 
 
+def attach_report(exch, flow):
+    buf = io.BytesIO()
+    httpolice.text_report([exch], buf)
+    if buf.getvalue():
+        report = buf.getvalue().decode('utf-8')
+        # It would be nicer to split this into separate metadata entries
+        # for request and response, but since `flow.metadata` is a plain dict,
+        # their order is random under Python 3.5 and sometimes response comes
+        # after request. Also wrap in ``try...except`` because `flow.metadata`
+        # is not public API yet.
+        try:
+            flow.metadata['HTTPolice report'] = ReprString(report)
+        except Exception:          # pragma: no cover
+            pass
+
+
 def log_exchange(exch, flow):
     severities = collections.Counter(notice.severity
                                      for msg in [exch.request] + exch.responses
@@ -122,6 +139,15 @@ def ellipsize(s, max_length=40):
         return s[:(max_length - len(ellipsis))] + ellipsis
     else:
         return s
+
+
+class ReprString(str):
+
+    # Currently mitmproxy displays ``repr()`` in details view, not ``str()``.
+    # See also https://discourse.mitmproxy.org/t/extending-the-ui/359/5
+
+    def __repr__(self):
+        return str(self)
 
 
 if __name__ == '__main__':
