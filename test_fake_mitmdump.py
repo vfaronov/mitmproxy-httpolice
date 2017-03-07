@@ -123,7 +123,7 @@ def test_complex(bench):               # pylint: disable=redefined-outer-name
         b'C 1073 Possibly missing Location header\n'
         b'------------ request: GET /\n'
         b'------------ response: 304 Not Modified\n'
-        b'C 1127 Content-Type in a 304 response\n'
+        b'C 1127 304 response should not have Content-Type\n'
     )
 
 
@@ -153,9 +153,9 @@ def test_http2(bench):          # pylint: disable=redefined-outer-name
         )
     assert bench.report == (
         b'------------ request: GET https://example.com/index.html\n'
-        b'E 1000 Malformed if-match header\n'
+        b'E 1000 Syntax error in If-Match header\n'
         b'------------ response: 404 Not Found\n'
-        b'E 1244 connection header in an HTTP/2 message\n'
+        b"E 1244 Connection header can't be used in HTTP/2\n"
     )
 
 
@@ -205,5 +205,5 @@ def test_silence(bench):         # pylint: disable=redefined-outer-name
     assert bench.report == (
         b'------------ request: GET /\n'
         b'------------ response: 401 Unauthorized\n'
-        b'C 1110 401 response with no Date header\n'
+        b'C 1110 Missing Date header\n'
     )

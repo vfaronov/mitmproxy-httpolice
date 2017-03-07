@@ -96,9 +96,9 @@ def test_http11_proxy(real_mitmdump):
         )
     assert real_mitmdump.report == (
         b'------------ request: GET /response-headers?ETag=foobar\n'
-        b'C 1070 No User-Agent header\n'
+        b'C 1070 Missing User-Agent header\n'
         b'------------ response: 200 OK\n'
-        b'E 1000 Malformed ETag header\n'
+        b'E 1000 Syntax error in ETag header\n'
     )
 
 
@@ -115,8 +115,8 @@ def test_http11_tunnel(real_mitmdump):
         )
     assert real_mitmdump.report == (
         b'------------ request: OPTIONS *\n'
-        b'C 1041 Body without Content-Type\n'
-        b'E 1062 OPTIONS request with a body but no Content-Type\n'
+        b'C 1041 Body should have a Content-Type\n'
+        b'E 1062 OPTIONS request with a body needs Content-Type\n'
     )
 
 
@@ -141,4 +141,4 @@ def test_http2_reverse(real_mitmdump):      # pragma: no cover
     # nghttp2.org currently has some problems that we can't rely on
     # (notices 1277 and 1109), so we check only specific things.
     assert (b'------------ request: GET https://nghttp2.org/\n'
-            b'C 1070 No User-Agent header\n') in real_mitmdump.report
+            b'C 1070 Missing User-Agent header\n') in real_mitmdump.report
