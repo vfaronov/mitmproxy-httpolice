@@ -57,6 +57,7 @@ def construct_request(flow):
     version, headers, body = extract_message_basics(flow.request)
     scheme = decode(flow.request.scheme)
     method = decode(flow.request.method)
+    promised = is_request_promised(flow)
 
     # Authority-form and absolute-form requests in the tunnel
     # are simply rejected as errors by mitmproxy, closing the connection.
@@ -71,7 +72,8 @@ def construct_request(flow):
             # the "absolute form" of request target (RFC 7540 Section 8.1.2.3).
             target = scheme + u'://' + decode(authority) + target
 
-    return httpolice.Request(scheme, method, target, version, headers, body)
+    return httpolice.Request(scheme, method, target, version, headers, body,
+                             promised=promised)
 
 
 def construct_response(flow):
@@ -125,6 +127,15 @@ def log_exchange(exch, flow):
             flow.request.method, ellipsize(flow.request.path),
             flow.response.status_code, ellipsize(flow.response.reason),
         ))
+
+
+def is_request_promised(flow):
+    # ``try...except`` because `flow.metadata` is not public API
+    # (much less ``h2-pushed-stream``).
+    try:
+        return bool(flow.metadata.get('h2-pushed-stream'))
+    except Exception:          # pragma: no cover
+        return None
 
 
 def decode(s):
