@@ -224,3 +224,50 @@ def test_no_report(bench):      # pylint: disable=redefined-outer-name
             ),
         )
     assert bench.report == b''
+
+
+def test_tail(bench):           # pylint: disable=redefined-outer-name
+    bench.opts += ['--tail', '5']
+    with bench:
+        for i in range(10):
+            bench.flow(
+                tutils.treq(
+                    scheme='http', host='example.com', port=80,
+                    method='GET', path='/test%d' % i, http_version='HTTP/1.1',
+                    headers=Headers([(b'Host', b'example.com')]),
+                    content=b'',
+                ),
+                tutils.tresp(
+                    http_version='HTTP/1.1', status_code=200, reason='OK',
+                    headers=Headers([
+                        (b'Content-Type', b'text/plain'),
+                        (b'Content-Length', b'14'),
+                        (b'Date', b'Tue, 03 May 2016 14:13:34 GMT'),
+                    ]),
+                    content=b'Hello world!\r\n',
+                ),
+            )
+    assert bench.report == (
+        b'------------ request: GET /test5\n'
+        b'C 1070 Missing User-Agent header\n'
+        b'------------ request: GET /test6\n'
+        b'C 1070 Missing User-Agent header\n'
+        b'------------ request: GET /test7\n'
+        b'C 1070 Missing User-Agent header\n'
+        b'------------ request: GET /test8\n'
+        b'C 1070 Missing User-Agent header\n'
+        b'------------ request: GET /test9\n'
+        b'C 1070 Missing User-Agent header\n'
+    )
+
+
+def test_bad_tail(bench):                # pylint: disable=redefined-outer-name
+    bench.opts += ['--tail', '0']
+    with pytest.raises(SystemExit):
+        bench.start()
+
+
+def test_tail_without_report(bench):     # pylint: disable=redefined-outer-name
+    bench.opts = ['--tail', '5']
+    with pytest.raises(SystemExit):
+        bench.start()
