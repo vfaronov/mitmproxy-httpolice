@@ -15,17 +15,15 @@ import mitmproxy_httpolice
 class Bench:
 
     def __init__(self):
-        self.opts = []
+        fd, self.report_path = tempfile.mkstemp()
+        os.close(fd)
+        self.opts = ['-w', self.report_path]
         self.context = taddons.context()
-        self.report_path = None
         self.script_obj = None
         self.report = None
 
     def start(self):
-        fd, self.report_path = tempfile.mkstemp()
-        os.close(fd)
-        argv = self.opts + [self.report_path]
-        self.script_obj = mitmproxy_httpolice.start(argv)
+        self.script_obj = mitmproxy_httpolice.start(self.opts)
 
     def flow(self, req, resp):
         self.script_obj.response(tflow.tflow(req=req, resp=resp))
@@ -160,7 +158,7 @@ def test_http2(bench):          # pylint: disable=redefined-outer-name
 
 
 def test_html(bench):           # pylint: disable=redefined-outer-name
-    bench.opts = ['-o', 'html']
+    bench.opts += ['-o', 'html']
     with bench:
         bench.flow(
             tutils.treq(
@@ -184,7 +182,7 @@ def test_html(bench):           # pylint: disable=redefined-outer-name
 
 
 def test_silence(bench):         # pylint: disable=redefined-outer-name
-    bench.opts = ['-s', '1087', '-s', '1194']
+    bench.opts += ['-s', '1087', '-s', '1194']
     with bench:
         bench.flow(
             tutils.treq(
@@ -207,3 +205,22 @@ def test_silence(bench):         # pylint: disable=redefined-outer-name
         b'------------ response: 401 Unauthorized\n'
         b'C 1110 Missing Date header\n'
     )
+
+
+def test_no_report(bench):      # pylint: disable=redefined-outer-name
+    bench.opts = []             # Remove the default ``-w /path/to/report.txt``
+    with bench:
+        bench.flow(
+            tutils.treq(
+                scheme='http', host='example.com', port=80,
+                method='GET', path='/', http_version='HTTP/1.1',
+                headers=Headers(),
+                content=b'',
+            ),
+            tutils.tresp(
+                http_version='HTTP/1.1', status_code=200, reason='OK',
+                headers=Headers(),
+                content=b'Hello world!\r\n',
+            ),
+        )
+    assert bench.report == b''

@@ -17,25 +17,22 @@ reports = {'text': httpolice.text_report, 'html': httpolice.html_report}
 def start(argv=None):
     parser = argparse.ArgumentParser(prog=os.path.basename(__file__),
                                      add_help=False)
+    parser.add_argument('-w', '--write-report', metavar='PATH',
+                        type=argparse.FileType('wb'))
     parser.add_argument('-o', '--output', choices=reports, default='text')
     parser.add_argument('-s', '--silence', metavar='ID',
-                        type=int, action='append')
-    parser.add_argument('report_path')
+                        type=int, action='append', default=[])
     args = parser.parse_args(argv)
-    return MitmproxyHTTPolice(args.report_path, args.output, args.silence)
+    return MitmproxyHTTPolice(args.write_report, args.output, args.silence)
 
 
 class MitmproxyHTTPolice(object):
 
-    def __init__(self, report_path, output_format, silence=None):
-        self.report_path = os.path.expanduser(report_path)
+    def __init__(self, report_file, output_format, silence):
+        self.report_file = report_file
         self.output_format = output_format
-        self.silence = silence or []
+        self.silence = silence
         self.exchanges = []
-
-        # Open the output file right now, because if it's wrong,
-        # we don't want to wait until the end and lose all collected data.
-        self.report_file = io.open(self.report_path, 'wb')
 
     def response(self, flow):
         req = construct_request(flow)
@@ -48,9 +45,10 @@ class MitmproxyHTTPolice(object):
         log_exchange(exch, flow)
 
     def done(self):
-        with self.report_file:
+        if self.report_file:
             report = reports[self.output_format]
             report(self.exchanges, self.report_file)
+            self.report_file.close()
 
 
 def construct_request(flow):

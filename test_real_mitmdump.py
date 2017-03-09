@@ -36,7 +36,7 @@ class RealMitmdump(object):
             ['python3', '-m', 'mitmproxy_httpolice']).decode().strip()
         args = (['--conf', config_path, '-p', str(self.port)] +
                 self.extra_options +
-                ['-s', "'%s' '%s'" % (script_path, self.report_path)])
+                ['-s', "'%s' -w '%s'" % (script_path, self.report_path)])
         self.process = subprocess.Popen(['mitmdump'] + args)
         time.sleep(5)       # Give it some time to get up and running
 
