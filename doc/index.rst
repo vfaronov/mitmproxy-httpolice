@@ -43,11 +43,11 @@ __ http://httpolice.readthedocs.io/en/stable/install.html
    See the “Installation from Source” sections in mitmproxy docs.
 
 
-Usage
------
+Basic usage
+-----------
 To run HTTPolice together with mitmproxy, use a command like this::
 
-  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -o html report.html"
+  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -o html -w report.html"
 
 Note the backticks.
 Replace ``mitmdump`` with ``mitmproxy`` or ``mitmweb`` as needed.
@@ -63,17 +63,64 @@ that prints the path to the script file::
 
 ``-o html`` tells HTTPolice to produce HTML reports
 (omit it if you want a plain text report).
-Finally, ``report.html`` is the name of the output file.
+Finally, ``-w report.html`` gives the name of the output file.
 
-Now, mitmproxy starts up as usual.
+Now, mitmdump starts up as usual.
 Every exchange that it intercepts is checked by HTTPolice.
-When you stop mitmdump (Ctrl+C) or exit mitmproxy,
-HTTPolice writes an HTML report to ``report.html``.
+When you stop mitmdump (Ctrl+C), HTTPolice writes a report to ``report.html``.
 
+
+Inspecting traffic on the fly
+-----------------------------
+Often, you don’t want to get one big report at the end:
+you want to see a report for every request/response as it arrives.
+You can do this with the ``--tail`` option, which tells mitmproxy-HTTPolice
+to regenerate the report on every new exchange::
+
+  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -o html -w report.html --tail 5"
+
+With the above command, ``report.html`` will always contain
+a report on the **last 5 exchanges** seen by mitmproxy.
+The latest exchange is at the **bottom** of the page.
+
+Instead of constantly refreshing that page, you can keep an eye on the log
+that mitmdump prints to the console, because HTTPolice will notify you
+whenever there’s something to see::
+
+  HTTPolice found 2 errors, 3 comments in: POST /api/v1/customer/ - 201 Created
+
+
+Integration with the console UI
+-------------------------------
+When using the `console UI of mitmproxy`__ (the tool named ``mitmproxy``),
+you can also see the report for every exchange (“flow” in mitmproxy parlance)
+on its “Detail” tab:
+
+.. image:: mitmproxy-detail.png
+
+__ http://docs.mitmproxy.org/en/stable/mitmproxy.html
+
+How do you even know that there’s anything to see there?
+Currently the only way is to follow the eventlog,
+which you can trigger by pressing the ‘e’ key:
+
+.. image:: mitmproxy-eventlog.png
+
+When using mitmproxy-HTTPolice like this, you don’t have to specify
+an output file. You can simply run::
+
+  $ mitmproxy -s "`python3 -m mitmproxy_httpolice`"
+
+Of course, if you *also* want a fully-fledged report,
+you can combine this with the ``-w``, ``-o`` and ``--tail`` options.
+
+
+More options
+------------
 You can use the ``-s`` option to :ref:`silence <silence>` unwanted notices,
 just as with the ``httpolice`` command-line tool::
 
-  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -s 1089 -s 1194 report.txt"
+  $ mitmdump -s "`python3 -m mitmproxy_httpolice` -s 1089 -s 1194 -w report.txt"
 
 mitmproxy itself has many interesting options.
 One of the more useful features is the ability to dump traffic into a file.

@@ -7,6 +7,37 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+
+Added
+-----
+- A new ``--tail`` option to regenerate the report on every new exchange,
+  so you can inspect traffic as it comes (see `docs`_).
+
+- HTTPolice now writes brief summaries to mitmproxy’s eventlog, like this::
+
+    HTTPolice found 1 errors, 2 comments in: GET /api/v1/ - 200 OK
+
+  (The eventlog is printed to the console when you use ``mitmdump``,
+  or to the “Event log” pane when you press the ‘e’ key in ``mitmproxy``.)
+
+- In the ``mitmproxy`` console UI, you can now see a brief report
+  for every individual exchange on its “Detail” pane (see `docs`_).
+
+.. _docs: http://mitmproxy-httpolice.readthedocs.io/en/stable/
+
+Changed
+-------
+- The output file is now specified with the ``-w`` option instead of
+  just a positional argument, for example::
+
+    $ mitmdump -s "`python3 -m mitmproxy_httpolice` -w report.txt"
+
+  This ``-w`` option is actually *optional*: you can omit it
+  if you only want to view the reports in the console UI, for example.
+
+
 0.5.1 - 2017-02-28
 ~~~~~~~~~~~~~~~~~~
 Fixed an error that happened on many/most HTTP/2 requests
