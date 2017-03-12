@@ -9,7 +9,7 @@ import httpolice
 import mitmproxy.ctx
 
 
-__version__ = '0.6.0.dev1'
+__version__ = '0.6.0'
 
 reports = {'text': httpolice.text_report, 'html': httpolice.html_report}
 
