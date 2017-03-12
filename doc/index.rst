@@ -101,7 +101,7 @@ on its “Detail” tab:
 __ http://docs.mitmproxy.org/en/stable/mitmproxy.html
 
 How do you even know that there’s anything to see there?
-Currently the only way is to follow the eventlog,
+Currently the only way is to follow the event log,
 which you can trigger by pressing the ‘e’ key:
 
 .. image:: mitmproxy-eventlog.png

@@ -5,8 +5,8 @@ import collections
 import io
 import os
 
-import mitmproxy.ctx
 import httpolice
+import mitmproxy.ctx
 
 
 __version__ = '0.6.0.dev1'
@@ -30,7 +30,7 @@ def start(argv=None):
                               args.silence)
 
 
-class MitmproxyHTTPolice(object):
+class MitmproxyHTTPolice:
 
     def __init__(self, report_file, tail, output_format, silence):
         self.report_file = report_file
@@ -75,14 +75,14 @@ def construct_request(flow):
     # are simply rejected as errors by mitmproxy, closing the connection.
     target = decode(flow.request.path)
 
-    if version == u'HTTP/2':
+    if version == 'HTTP/2':
         pseudo_headers = httpolice.helpers.pop_pseudo_headers(headers)
-        authority = pseudo_headers.get(u':authority')
-        has_host = any(k.lower() == u'host' for (k, v) in headers)
-        if authority and not has_host and target.startswith(u'/'):
+        authority = pseudo_headers.get(':authority')
+        has_host = any(k.lower() == 'host' for (k, v) in headers)
+        if authority and not has_host and target.startswith('/'):
             # Reconstruct HTTP/2's equivalent of
             # the "absolute form" of request target (RFC 7540 Section 8.1.2.3).
-            target = scheme + u'://' + decode(authority) + target
+            target = scheme + '://' + decode(authority) + target
 
     return httpolice.Request(scheme, method, target, version, headers, body)
 
@@ -91,15 +91,15 @@ def construct_response(flow):
     version, headers, body = extract_message_basics(flow.response)
     status = flow.response.status_code
     reason = decode(flow.response.reason)
-    if version == u'HTTP/2':
+    if version == 'HTTP/2':
         httpolice.helpers.pop_pseudo_headers(headers)
     return httpolice.Response(version, status, reason, headers, body)
 
 
 def extract_message_basics(msg):
     version = decode(msg.http_version)
-    if version == u'HTTP/2.0':
-        version = u'HTTP/2'
+    if version == 'HTTP/2.0':
+        version = 'HTTP/2'
     headers = [(decode(k), v) for (k, v) in msg.headers.fields]
     body = msg.raw_content
     return version, headers, body
@@ -149,7 +149,7 @@ def decode(s):
 
 def ellipsize(s, max_length=40):
     if len(s) > max_length:
-        ellipsis = u'...'
+        ellipsis = '...'
         return s[:(max_length - len(ellipsis))] + ellipsis
     else:
         return s
@@ -159,6 +159,8 @@ class ReprString(str):
 
     # Currently mitmproxy displays ``repr()`` in details view, not ``str()``.
     # See also https://discourse.mitmproxy.org/t/extending-the-ui/359/5
+
+    __slots__ = []
 
     def __repr__(self):
         return str(self)

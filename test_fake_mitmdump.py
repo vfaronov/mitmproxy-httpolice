@@ -89,7 +89,7 @@ def test_complex(bench):               # pylint: disable=redefined-outer-name
             ),
             tutils.tresp(
                 http_version='HTTP/1.1',
-                status_code=201, reason=u'Très bien'.encode('iso-8859-1'),
+                status_code=201, reason='Très bien'.encode('iso-8859-1'),
                 headers=Headers([(b'Content-Type', b'text/plain'),
                                  (b'Content-Length', b'14'),
                                  (b'Date', b'Tue, 03 May 2016 14:13:34 GMT')]),

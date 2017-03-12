@@ -15,11 +15,11 @@ Added
 - A new ``--tail`` option to regenerate the report on every new exchange,
   so you can inspect traffic as it comes (see `docs`_).
 
-- HTTPolice now writes brief summaries to mitmproxy’s eventlog, like this::
+- HTTPolice now writes brief summaries to mitmproxy’s event log, like this::
 
     HTTPolice found 1 errors, 2 comments in: GET /api/v1/ - 200 OK
 
-  (The eventlog is printed to the console when you use ``mitmdump``,
+  (The event log is printed to the console when you use ``mitmdump``,
   or to the “Event log” pane when you press the ‘e’ key in ``mitmproxy``.)
 
 - In the ``mitmproxy`` console UI, you can now see a brief report

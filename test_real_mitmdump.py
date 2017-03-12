@@ -17,7 +17,7 @@ import hyper.tls
 import pytest
 
 
-class RealMitmdump(object):
+class RealMitmdump:
 
     # pylint: disable=attribute-defined-outside-init
 
@@ -55,9 +55,9 @@ class RealMitmdump(object):
         # We need our own TLS context that does not verify certificates.
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         sock = socket.create_connection((self.host, self.port))
-        connect = (u'CONNECT {0}:{1} HTTP/1.1\r\n'
-                   u'Host: {0}\r\n'
-                   u'\r\n'.format(host, port))
+        connect = ('CONNECT {0}:{1} HTTP/1.1\r\n'
+                   'Host: {0}\r\n'
+                   '\r\n'.format(host, port))
         sock.sendall(connect.encode('iso-8859-1'))
         assert sock.recv(4096).startswith(b'HTTP/1.1 2')
         sock = context.wrap_socket(sock, server_hostname=host)
