@@ -45,7 +45,6 @@ class RealMitmdump:
     # and I don't want to pull in Requests just for this.
 
     def send_request(self, data):
-        # pylint: disable=no-member
         sock = socket.create_connection(('localhost', self.port))
         sock.sendall(data)
         sock.recv(4096)
