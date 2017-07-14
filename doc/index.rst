@@ -4,7 +4,7 @@ mitmproxy integration for HTTPolice
 .. highlight:: console
 
 `mitmproxy`__ is an advanced HTTP debugging tool
-that can intercept TLS-encrypted connections, supports HTTP/2, and many more.
+that can intercept TLS-encrypted connections, supports HTTP/2, and much more.
 
 __ https://mitmproxy.org/
 
