@@ -7,6 +7,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 (which means it is unstable until 1.0).
 
 
+Unreleased
+~~~~~~~~~~
+- Fixed dumping reports to non-seekable files (like ``-w /dev/stdout``).
+
+
 0.6.0 - 2017-03-12
 ~~~~~~~~~~~~~~~~~~
 

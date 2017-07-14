@@ -128,4 +128,4 @@ If you do this, you can then “replay” it as many times as you wish::
 
   $ mitmdump --wfile flows.dat
   $ mitmdump --no-server --read-flows flows.dat \
-  >     -s "`python3 -m mitmproxy_httpolice` /dev/stdout"
+  >     -s "`python3 -m mitmproxy_httpolice` -w /dev/stdout"

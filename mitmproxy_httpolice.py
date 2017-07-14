@@ -50,19 +50,23 @@ class MitmproxyHTTPolice:
         httpolice.check_exchange(exch)
         self.exchanges.append(exch)
         if self.tail:
+            self.clear_report()
             self.dump_report()
         attach_report(exch, flow)
         log_exchange(exch, flow)
 
     def done(self):
         if self.report_file:
-            self.dump_report()
+            if not self.tail:
+                self.dump_report()
             self.report_file.close()
+
+    def clear_report(self):
+        self.report_file.seek(0)
+        self.report_file.truncate()
 
     def dump_report(self):
         report_func = reports[self.output_format]
-        self.report_file.seek(0)
-        self.report_file.truncate()
         report_func(self.exchanges, self.report_file)
 
 
