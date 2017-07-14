@@ -68,6 +68,7 @@ class MitmproxyHTTPolice:
     def dump_report(self):
         report_func = reports[self.output_format]
         report_func(self.exchanges, self.report_file)
+        self.report_file.flush()
 
 
 def construct_request(flow):

@@ -10,6 +10,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_
 Unreleased
 ~~~~~~~~~~
 - Fixed dumping reports to non-seekable files (like ``-w /dev/stdout``).
+- Fixed ``--tail`` with small (text) reports.
 
 
 0.6.0 - 2017-03-12
