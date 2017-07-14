@@ -41,5 +41,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Quality Assurance',
     ],
-    keywords='HTTP message request response standards RFC lint check proxy',
+    keywords='HTTP message request response standards RFC validator proxy',
 )
