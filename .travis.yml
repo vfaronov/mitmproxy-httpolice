@@ -48,7 +48,4 @@ deploy:
     password:
         secure: La/nkC/5zy/HZt5qOYl8RFnRmdNBrgEoa75BfD3lCLC01NIq0+ZPVkIlVEPxypCUEe+M/qAqXDBDDr+YYWoSl2r6GOnM+lCTG/rOkwrQHPby2MimEnuhJFYHS8v3AmcFZRSyNrKmwroNqLwYmHIydTIvMTFD2O+0MJv2DyDBGekAX2LPhXSCo1Cvv3YLoz8DcBlO/xdnxhMq5CSaqb+ea6o/bQ+mSXngpadXBQu58ZTQn8ptCROBvRrqd6ONdy63FMZix7D/3TXEMqTdaK2vdYUXX7GhSyUMhP3LyQy15eFFV3Um9LRgx2dFEIc+123NX9LwJXrmv4J1sj3wQcUPkwaGdS9EQ1fqCIbWxeXIrUYf3K1xpIWdl5S6Ojh3zH/Z7TT+fx2T1+CyxVqU/FGlyRiQ1CnBBNZgOmSpwnNoGSkF5GmIChHTgEdNTgskKlMy7oLFagIHVuYrYKtgHMx8Ty80gyw8XTUr9vembnt3o2x16qgLFmoVSEE3oGu38vDfAwbOsD3WnLnKH8dtPLjc9WpW3foEEZFEXvzphmE8juAXfAV1Q6g8lw9E43uclRHxDtP3wx8PzdxLYu+PYvVU6TOy5et4zUm0SH9SYdC/Pcj8gZ8Fy9DTvTivmz666zQjS3zXwDJ6FUMAQjU/QVfrxhhGTzL9b/SP+oGYuitLS5E=
     distributions: "sdist bdist_wheel"
-    # Travis insists on uploading the docs --
-    # https://github.com/travis-ci/dpl/issues/334 --
-    # but we can tell it to upload a stub instead of the actual docs.
-    docs_dir: tools/pythonhosted.org
+    skip_upload_docs: true
