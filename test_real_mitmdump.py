@@ -92,6 +92,7 @@ def test_http11_proxy(real_mitmdump):
         real_mitmdump.send_request(
             b'GET http://httpbin.org/response-headers?ETag=foobar HTTP/1.1\r\n'
             b'Host: httpbin.org\r\n'
+            b'HTTPolice-Silence: 1277 resp\r\n'
             b'\r\n'
         )
     assert real_mitmdump.report == (
