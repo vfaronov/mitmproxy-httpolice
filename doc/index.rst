@@ -12,10 +12,10 @@ mitmproxy-HTTPolice is a `script for mitmproxy`__
 that will check intercepted exchanges and produce an `HTTPolice`__ report.
 It also works with mitmproxy’s companion tools `mitmdump`__ and `mitmweb`__.
 
-__ http://docs.mitmproxy.org/en/stable/scripting/overview.html
-__ http://httpolice.readthedocs.io/en/stable/
-__ http://docs.mitmproxy.org/en/stable/mitmdump.html
-__ http://docs.mitmproxy.org/en/stable/mitmweb.html
+__ http://docs.mitmproxy.org/page/scripting/overview.html
+__ http://httpolice.readthedocs.io/
+__ http://docs.mitmproxy.org/page/mitmdump.html
+__ http://docs.mitmproxy.org/page/mitmweb.html
 
 For recent changes in mitmproxy-HTTPolice, see the `changelog`__.
 
@@ -32,8 +32,8 @@ Do this in a Python 3.5+ environment::
 If this is giving you trouble,
 see `mitmproxy docs`__ and `HTTPolice docs`__ for more detailed instructions.
 
-__ http://docs.mitmproxy.org/en/stable/install.html
-__ http://httpolice.readthedocs.io/en/stable/install.html
+__ http://docs.mitmproxy.org/page/install.html
+__ http://httpolice.readthedocs.io/page/install.html
 
 .. note::
 
@@ -98,7 +98,7 @@ on its “Detail” tab:
 
 .. image:: mitmproxy-detail.png
 
-__ http://docs.mitmproxy.org/en/stable/mitmproxy.html
+__ http://docs.mitmproxy.org/page/mitmproxy.html
 
 How do you even know that there’s anything to see there?
 Currently the only way is to follow the event log,
