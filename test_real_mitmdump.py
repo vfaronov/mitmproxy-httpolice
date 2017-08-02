@@ -144,3 +144,5 @@ def test_http2_reverse(real_mitmdump):      # pragma: no cover
     # (notices 1277 and 1109), so we check only specific things.
     assert (b'------------ request: GET https://nghttp2.org/\n'
             b'C 1070 Missing User-Agent header\n') in real_mitmdump.report
+    # Promised requests
+    assert real_mitmdump.report.count(b'------------ request: GET ') > 1
