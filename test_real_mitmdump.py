@@ -9,12 +9,13 @@ import random
 import socket
 import ssl
 import subprocess
-import tempfile
 import time
 
 import hyper
 import hyper.tls
 import pytest
+
+import mitmproxy_httpolice
 
 
 class RealMitmdump:
@@ -23,20 +24,23 @@ class RealMitmdump:
 
     host = 'localhost'
 
-    def __init__(self):
+    def __init__(self, report_path):
         self.port = random.randint(1024, 65535)
         self.extra_options = []
+        self.report_path = report_path
 
     def start(self):
         config_path = os.path.join(
             os.path.dirname(__file__), 'tools', 'mitmproxy-config')
-        fd, self.report_path = tempfile.mkstemp()
-        os.close(fd)
-        script_path = subprocess.check_output(
-            ['python3', '-m', 'mitmproxy_httpolice']).decode().strip()
+        script_path = mitmproxy_httpolice.__file__
         args = (['--conf', config_path, '-p', str(self.port)] +
                 self.extra_options +
-                ['-s', "'%s' -w '%s'" % (script_path, self.report_path)])
+                # Use ``--tail`` because on Windows apparently
+                # :meth:`subprocess.Popen.terminate` immediately kills
+                # the process, giving it no chance to write the report
+                # in `done`.
+                ['-s', "'%s' --tail 100 -w '%s'" % (script_path,
+                                                    self.report_path)])
         self.process = subprocess.Popen(['mitmdump'] + args)
         time.sleep(5)       # Give it some time to get up and running
 
@@ -70,8 +74,6 @@ class RealMitmdump:
         if collect:
             with io.open(self.report_path, 'rb') as f:
                 self.report = f.read()
-        if os.path.exists(self.report_path):
-            os.remove(self.report_path)
 
     def __enter__(self):
         self.start()
@@ -82,8 +84,8 @@ class RealMitmdump:
 
 
 @pytest.fixture
-def real_mitmdump(request):                  # pylint: disable=unused-argument
-    return RealMitmdump()
+def real_mitmdump(request, tmpdir):                  # pylint: disable=unused-argument
+    return RealMitmdump(str(tmpdir.join('report.txt')))
 
 
 def test_http11_proxy(real_mitmdump):
