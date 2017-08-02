@@ -84,7 +84,7 @@ class RealMitmdump:
 
 
 @pytest.fixture
-def real_mitmdump(request, tmpdir):                  # pylint: disable=unused-argument
+def real_mitmdump(tmpdir):
     return RealMitmdump(str(tmpdir.join('report.txt')))
 
 
