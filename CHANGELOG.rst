@@ -2,8 +2,8 @@ History of changes
 ==================
 
 
-Unreleased
-~~~~~~~~~~
+0.6.1 - 2017-08-02
+~~~~~~~~~~~~~~~~~~
 - Fixed dumping reports to non-seekable files (like ``-w /dev/stdout``).
 - Fixed ``--tail`` with small (text) reports.
 
