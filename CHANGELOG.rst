@@ -5,6 +5,7 @@ History of changes
 Unreleased
 ~~~~~~~~~~
 - Overhaul for mitmproxy 3.
+- Brief reports shown on the “Detail” pane in the console are a bit nicer now.
 
 
 0.6.1 - 2017-08-02

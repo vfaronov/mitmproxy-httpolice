@@ -64,17 +64,40 @@ def extract_message_basics(msg):
 def attach_report(exch, flow):
     buf = io.BytesIO()
     httpolice.text_report([exch], buf)
-    if buf.getvalue():
-        report = buf.getvalue().decode('utf-8')
-        # It would be nicer to split this into separate metadata entries
-        # for request and response, but since `flow.metadata` is a plain dict,
-        # their order is random under Python 3.5 and sometimes request comes
-        # after response. Also wrap in ``try...except`` because `flow.metadata`
-        # is not public API yet.
-        try:
-            flow.metadata['HTTPolice report'] = ReprString(report)
-        except Exception:          # pragma: no cover
-            pass
+    report = buf.getvalue().decode('utf-8')
+    for_request, for_response = parse_report(report)
+    metadata_entries = [('Request notices', for_request),
+                        ('Response notices', for_response)]
+    try:
+        for title, lines in metadata_entries:
+            if lines:
+                text = u'\n'.join(lines) + u'\n'
+                flow.metadata[HashHack(title)] = ReprString(text)
+    except Exception:               # pragma: no cover
+        # `flow.metadata` is not public API, so could theoretically fail.
+        pass
+
+
+def parse_report(report):
+    # `report` is a text report as produced by HTTPolice. From it, we want to
+    # extract the notices (titles) for the request and for the response.
+    # This may sound stupid: why not just make HTTPolice return them
+    # in a structured form? But that would have to be a public API
+    # (mitmproxy-HTTPolice doesn't use any private APIs from HTTPolice), and I
+    # don't want to add public APIs to HTTPolice without a clear picture of
+    # how and by whom they will be used. I want some sort of "JSON report"
+    # in HTTPolice eventually, but I don't know the details yet. So for now,
+    # let's just parse semi-structured text -- a great Unix tradition.
+    for_request, for_response = [], []
+    target = for_request
+    for line in report.splitlines():
+        if line.startswith('------------ request:'):
+            target = for_request
+        elif line.startswith('------------ response:'):
+            target = for_response
+        else:
+            target.append(line)
+    return for_request, for_response
 
 
 def log_exchange(exch, flow):
@@ -109,6 +132,23 @@ def ellipsize(s, max_length=40):
         return s[:(max_length - len(ellipsis))] + ellipsis
     else:
         return s
+
+
+class HashHack(str):
+
+    # Under Python 3.5, keys of `flow.metadata` (which is a plain `dict`)
+    # are iterated over, and hence displayed in the UI, in random order,
+    # depending on the hash seed. This may cause response notices to be shown
+    # before request notices. Work around this with a hack that forces
+    # the desired hash for the string. This may theoretically not work under
+    # some unusual Python implementation, but if it doesn't work, all we get
+    # is a slightly inconvenient UI. The alternative is to lump the entire
+    # report into one metadata entry, which looks ugly for everyone.
+
+    __slots__ = []
+
+    def __hash__(self):
+        return 1 if u'request' in self.lower() else 2
 
 
 class ReprString(str):
