@@ -87,7 +87,7 @@ Instead of constantly refreshing that page, you can keep an eye on the log
 that mitmdump prints to the console, because HTTPolice will notify you
 whenever there’s something to see::
 
-  HTTPolice found 2 errors, 3 comments in: POST /api/v1/customer/ - 201 Created
+  HTTPolice: 2 errors, 3 comments in: POST /api/v1/customer/ ← 201
 
 
 Integration with the console UI

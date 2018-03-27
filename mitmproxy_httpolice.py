@@ -112,10 +112,10 @@ def log_exchange(exch, flow):
         log_func = (mitmproxy.ctx.log.warn
                     if max(severities) >= httpolice.Severity.error
                     else mitmproxy.ctx.log.info)
-        log_func('HTTPolice found %s in: %s %s - %d %s' % (
+        log_func('HTTPolice: %s in: %s %s ← %d' % (
             ', '.join(pieces),
             flow.request.method, ellipsize(flow.request.path),
-            flow.response.status_code, ellipsize(flow.response.reason),
+            flow.response.status_code,
         ))
 
 
