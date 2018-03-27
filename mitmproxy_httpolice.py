@@ -1,9 +1,7 @@
 # -*- coding: utf-8; -*-
 
-import argparse
 import collections
 import io
-import os
 
 import httpolice
 import mitmproxy.ctx
@@ -11,64 +9,17 @@ import mitmproxy.ctx
 
 __version__ = '0.7.0.dev1'
 
-reports = {'text': httpolice.text_report, 'html': httpolice.html_report}
-
-
-def start(argv=None):
-    parser = argparse.ArgumentParser(prog=os.path.basename(__file__),
-                                     add_help=False)
-    parser.add_argument('-w', '--write-report', metavar='PATH',
-                        type=argparse.FileType('wb'))
-    parser.add_argument('--tail', metavar='N', type=positive_int, default=None)
-    parser.add_argument('-o', '--output', choices=reports, default='text')
-    parser.add_argument('-s', '--silence', metavar='ID',
-                        type=int, action='append', default=[])
-    args = parser.parse_args(argv)
-    if args.tail and not args.write_report:
-        parser.error('--tail requires -w/--write-report')
-    return MitmproxyHTTPolice(args.write_report, args.tail, args.output,
-                              args.silence)
-
 
 class MitmproxyHTTPolice:
-
-    def __init__(self, report_file, tail, output_format, silence):
-        self.report_file = report_file
-        self.tail = tail
-        self.output_format = output_format
-        self.silence = silence
-        if self.tail is None:
-            self.exchanges = []
-        else:
-            self.exchanges = collections.deque(maxlen=self.tail)
 
     def response(self, flow):
         req = construct_request(flow)
         resp = construct_response(flow)
         exch = httpolice.Exchange(req, [resp])
-        exch.silence(self.silence)
         httpolice.check_exchange(exch)
-        self.exchanges.append(exch)
-        if self.tail:
-            self.clear_report()
-            self.dump_report()
         attach_report(exch, flow)
         log_exchange(exch, flow)
 
-    def done(self):
-        if self.report_file:
-            if not self.tail:
-                self.dump_report()
-            self.report_file.close()
-
-    def clear_report(self):
-        self.report_file.seek(0)
-        self.report_file.truncate()
-
-    def dump_report(self):
-        report_func = reports[self.output_format]
-        report_func(self.exchanges, self.report_file)
-        self.report_file.flush()
 
 
 def construct_request(flow):
@@ -171,11 +122,7 @@ class ReprString(str):
         return str(self)
 
 
-def positive_int(x):
-    x = int(x)
-    if x < 1:
-        raise ValueError('must be positive')
-    return x
+addons = [MitmproxyHTTPolice()]
 
 
 if __name__ == '__main__':

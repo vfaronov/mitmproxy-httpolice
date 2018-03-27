@@ -2,6 +2,11 @@ History of changes
 ==================
 
 
+Unreleased
+~~~~~~~~~~
+- Overhaul for mitmproxy 3.
+
+
 0.6.1 - 2017-08-02
 ~~~~~~~~~~~~~~~~~~
 - Fixed dumping reports to non-seekable files (like ``-w /dev/stdout``).
