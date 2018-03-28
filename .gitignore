@@ -1,6 +1,4 @@
 *.pyc
 .cache
-.coverage
 _build
-htmlcov
 mitmproxy_HTTPolice.egg-info

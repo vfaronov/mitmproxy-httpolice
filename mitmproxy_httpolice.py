@@ -114,7 +114,7 @@ def attach_report(exch, flow):
             if lines:
                 text = u'\n'.join(lines) + u'\n'
                 flow.metadata[HashHack(title)] = ReprString(text)
-    except Exception:               # pragma: no cover
+    except Exception:
         # `flow.metadata` is not public API, so could theoretically fail.
         pass
 

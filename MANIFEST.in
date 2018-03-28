@@ -5,11 +5,8 @@ include README.rst
 include LICENSE.txt
 include CHANGELOG.rst
 
-include test_*.py
-include .coveragerc
 include .isort.cfg
 include pylintrc
-include pytest.ini
 
 # Even though Travis only works on a Git repo,
 # this file is important as a reference on the build procedure.

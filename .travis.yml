@@ -2,6 +2,13 @@ language: python
 dist: trusty
 sudo: false
 
+addons:
+    apt:
+        packages:
+            # Used by integration tests.
+            - expect
+            - netcat-openbsd
+
 python:
     - "3.5"
     - "3.6"
@@ -24,7 +31,10 @@ script:
     # Basic stuff.
     - python setup.py check --strict --restructuredtext
     - pylint *.py
-    - pytest
+
+    # Spin up an actual mitmproxy instance and run a few requests through it.
+    # No HTTP/2 here, because trusty doesn't have nghttp.
+    - tools/integration_tests.tcl
 
     # Although the docs are processed by Read the Docs,
     # we still want to check that they are building OK.

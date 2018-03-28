@@ -1,9 +1,6 @@
 pip-tools
 check-manifest
 pylint
-pytest
-hyper
-pytest-cov
 docutils
 wheel
 twine
