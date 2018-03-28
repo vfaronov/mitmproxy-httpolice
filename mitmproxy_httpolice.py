@@ -16,6 +16,15 @@ __version__ = '0.7.0.dev1'
 
 class MitmproxyHTTPolice:
 
+    def load(self, loader):
+        loader.add_option(
+            name='httpolice_silence',
+            # ``typing.Sequence[int]`` would be better, but is not supported.
+            typespec=typing.Sequence[str],
+            default=[],
+            help='Silence these HTTPolice notice IDs.',
+        )
+
     def response(self, flow):
         exch = flow_to_exchange(flow)
         attach_report(exch, flow)
@@ -49,6 +58,7 @@ def flow_to_exchange(flow):
     req = construct_request(flow)
     resp = construct_response(flow)
     exch = httpolice.Exchange(req, [resp])
+    exch.silence([int(id_) for id_ in mitmproxy.ctx.options.httpolice_silence])
     httpolice.check_exchange(exch)
     return exch
 

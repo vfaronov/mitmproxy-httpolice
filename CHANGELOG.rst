@@ -9,11 +9,14 @@ Unreleased
   Instead, there are `mitmproxy commands`_ ``httpolice.report.html`` and
   ``httpolice.report.text``, which take a `filter`_ and a path to write to.
   See the `manual`_ for hints on how to use them.
+- Notices to silence are now specified with the `mitmproxy option`_
+  ``httpolice_silence``.
 - Brief reports shown on the “Detail” pane in the console are a bit nicer now.
 
 .. _mitmproxy commands: https://docs.mitmproxy.org/stable/concepts-commands/
 .. _filter: https://docs.mitmproxy.org/stable/concepts-filters/
 .. _manual: http://mitmproxy-httpolice.readthedocs.io/
+.. _mitmproxy option: https://docs.mitmproxy.org/stable/concepts-options/
 
 
 0.6.1 - 2017-08-02
