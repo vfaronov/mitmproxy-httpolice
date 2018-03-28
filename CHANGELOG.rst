@@ -5,7 +5,15 @@ History of changes
 Unreleased
 ~~~~~~~~~~
 - Overhaul for mitmproxy 3.
+- There are no more options ``-w``, ``-o``, ``--tail`` to produce a report.
+  Instead, there are `mitmproxy commands`_ ``httpolice.report.html`` and
+  ``httpolice.report.text``, which take a `filter`_ and a path to write to.
+  See the `manual`_ for hints on how to use them.
 - Brief reports shown on the “Detail” pane in the console are a bit nicer now.
+
+.. _mitmproxy commands: https://docs.mitmproxy.org/stable/concepts-commands/
+.. _filter: https://docs.mitmproxy.org/stable/concepts-filters/
+.. _manual: http://mitmproxy-httpolice.readthedocs.io/
 
 
 0.6.1 - 2017-08-02

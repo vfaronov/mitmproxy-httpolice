@@ -2,9 +2,13 @@
 
 import collections
 import io
+import os.path
+import typing
 
 import httpolice
 import mitmproxy.ctx
+import mitmproxy.flow
+import mitmproxy.types
 
 
 __version__ = '0.7.0.dev1'
@@ -13,13 +17,40 @@ __version__ = '0.7.0.dev1'
 class MitmproxyHTTPolice:
 
     def response(self, flow):
-        req = construct_request(flow)
-        resp = construct_response(flow)
-        exch = httpolice.Exchange(req, [resp])
-        httpolice.check_exchange(exch)
+        exch = flow_to_exchange(flow)
         attach_report(exch, flow)
         log_exchange(exch, flow)
 
+    @mitmproxy.command.command('httpolice.report.html')
+    def html_report(self,
+                    flows: typing.Sequence[mitmproxy.flow.Flow],
+                    path: mitmproxy.types.Path) -> None:
+        """Produce an HTTPolice report (HTML) on flows."""
+        self.report(flows, httpolice.html_report, path)
+
+    @mitmproxy.command.command('httpolice.report.text')
+    def text_report(self,
+                    flows: typing.Sequence[mitmproxy.flow.Flow],
+                    path: mitmproxy.types.Path) -> None:
+        """Produce an HTTPolice report (text) on flows."""
+        self.report(flows, httpolice.text_report, path)
+
+    def report(self, flows, report_func, path):
+        # https://github.com/mitmproxy/mitmproxy/issues/3002
+        path = os.path.expanduser(path)
+        exchanges = (flow_to_exchange(flow) for flow in flows)
+        with open(path, 'wb') as f:
+            report_func(exchanges, f)
+        mitmproxy.ctx.log.alert(
+            'HTTPolice: wrote report on %d flows to %s' % (len(flows), path))
+
+
+def flow_to_exchange(flow):
+    req = construct_request(flow)
+    resp = construct_response(flow)
+    exch = httpolice.Exchange(req, [resp])
+    httpolice.check_exchange(exch)
+    return exch
 
 
 def construct_request(flow):
