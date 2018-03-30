@@ -6,7 +6,7 @@ import os.path
 import typing
 
 import httpolice
-import mitmproxy.ctx
+from mitmproxy import ctx
 import mitmproxy.flow
 import mitmproxy.types
 
@@ -50,7 +50,7 @@ class MitmproxyHTTPolice:
         exchanges = (flow_to_exchange(flow) for flow in flows)
         with open(path, 'wb') as f:
             report_func(exchanges, f)
-        mitmproxy.ctx.log.alert(
+        ctx.log.alert(
             'HTTPolice: wrote report on %d flows to %s' % (len(flows), path))
 
 
@@ -58,7 +58,7 @@ def flow_to_exchange(flow):
     req = construct_request(flow)
     resp = construct_response(flow)
     exch = httpolice.Exchange(req, [resp])
-    exch.silence([int(id_) for id_ in mitmproxy.ctx.options.httpolice_silence])
+    exch.silence([int(id_) for id_ in ctx.options.httpolice_silence])
     httpolice.check_exchange(exch)
     return exch
 
@@ -150,9 +150,9 @@ def log_exchange(exch, flow):
               for (severity, n) in sorted(severities.items(), reverse=True)
               if severity > httpolice.Severity.debug]
     if pieces:
-        log_func = (mitmproxy.ctx.log.warn
+        log_func = (ctx.log.warn
                     if max(severities) >= httpolice.Severity.error
-                    else mitmproxy.ctx.log.info)
+                    else ctx.log.info)
         log_func('HTTPolice: %s in: %s %s ← %d' % (
             ', '.join(pieces),
             flow.request.method, ellipsize(flow.request.path),
