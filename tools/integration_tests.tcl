@@ -22,6 +22,11 @@ set port 31994
 set scriptpath [exec python -m mitmproxy_httpolice]
 set reportpath "/tmp/httpolice-report"
 
+proc die {msg} {
+    puts $msg
+    exit 1
+}
+
 puts "spawning mitmproxy"
 spawn mitmproxy --conf /dev/null --listen-port $port \
     --scripts $scriptpath \
@@ -33,10 +38,7 @@ exec curl -sx "http://localhost:$port" "httpbin.org/stream/10"
 exec curl -sx "http://localhost:$port" "httpbin.org/response-headers?Etag=123"
 expect {
     "●" {}
-    timeout {
-        puts "no mark on flows with errors!"
-        exit 1
-    }
+    timeout {die "no mark on flows with errors!"}
 }
 
 puts "running as HTTP/1.1 reverse proxy"
@@ -56,10 +58,7 @@ send ":httpolice.report.html @all $reportpath.html\r"
 send ":httpolice.report.text @all $reportpath.txt\r"
 expect {
     "HTTPolice: wrote report on" {}
-    timeout {
-        puts "no acknowledgement alert from command!"
-        exit 1
-    }
+    timeout {die "no acknowledgement alert from command!"}
 }
 
 puts "checking flow details UI"
@@ -69,29 +68,20 @@ send ":console.nav.next\r"
 send ":console.nav.next\r"
 expect {
     "E 1038 Bad JSON body" {}
-    timeout {
-        puts "no notice 1038 title!"
-        exit 1
-    }
+    timeout {die "no notice 1038 title!"}
 }
 
 puts "checking silencing"
 send ":view.focus.next\r"
 expect {
-    "C 1277" {
-        puts "got silenced notice 1277!"
-        exit 1
-    }
+    "C 1277" {die "got silenced notice 1277!"}
 }
 
 puts "checking event log"
 send ":console.view.eventlog\r"
 expect {
     "warn: HTTPolice: " {}
-    timeout {
-        puts "no warning in event log!"
-        exit 1
-    }
+    timeout {die "no warning in event log!"}
 }
 
 puts "exiting mitmproxy"
