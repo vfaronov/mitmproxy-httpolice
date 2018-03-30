@@ -24,10 +24,23 @@ class MitmproxyHTTPolice:
             default=[],
             help='Silence these HTTPolice notice IDs.',
         )
+        loader.add_option(
+            name='httpolice_mark',
+            # Could make this a ``typing.Optional[str]``, but
+            # that doesn't work well with the interactive editors,
+            # so make "disable" an explicit choice.
+            typespec=str,
+            choices=[''] + [sev.name for sev in httpolice.Severity],
+            default='',
+            help=
+                'Mark flows where HTTPolice found notices of this severity '
+                'or higher (empty to disable).'
+        )
 
     def response(self, flow):
         exch = flow_to_exchange(flow)
         attach_report(exch, flow)
+        mark_exchange(exch, flow)
         log_exchange(exch, flow)
 
     @mitmproxy.command.command('httpolice.report.html')
@@ -139,6 +152,15 @@ def parse_report(report):
         else:
             target.append(line)
     return for_request, for_response
+
+
+def mark_exchange(exch, flow):
+    if ctx.options.httpolice_mark:
+        mark_severity = httpolice.Severity[ctx.options.httpolice_mark]
+        if any(notice.severity >= mark_severity
+               for msg in [exch.request] + exch.responses
+               for notice in msg.notices):
+            flow.marked = True
 
 
 def log_exchange(exch, flow):

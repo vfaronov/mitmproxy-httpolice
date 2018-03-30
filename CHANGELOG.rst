@@ -9,8 +9,9 @@ Unreleased
   Instead, there are `mitmproxy commands`_ ``httpolice.report.html`` and
   ``httpolice.report.text``, which take a `filter`_ and a path to write to.
   See the `manual`_ for hints on how to use them.
-- Notices to silence are now specified with the `mitmproxy option`_
-  ``httpolice_silence``.
+- Flows (exchanges) with notices can now be visually marked
+  in the mitmproxy UI if you set the `mitmproxy option`_ ``httpolice_mark``.
+- Notices to silence are now specified with the option ``httpolice_silence``.
 - Brief reports shown on the “Detail” pane in the console are a bit nicer now.
 
 .. _mitmproxy commands: https://docs.mitmproxy.org/stable/concepts-commands/

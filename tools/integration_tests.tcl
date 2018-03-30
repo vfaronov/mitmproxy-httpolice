@@ -24,12 +24,20 @@ set reportpath "/tmp/httpolice-report"
 
 puts "spawning mitmproxy"
 spawn mitmproxy --conf /dev/null --listen-port $port \
-    --scripts $scriptpath --set httpolice_silence=1277
+    --scripts $scriptpath \
+    --set httpolice_silence=1277 --set httpolice_mark=error
 expect ":$port"
 
 puts "running as HTTP/1.1 forward proxy"
 exec curl -sx "http://localhost:$port" "httpbin.org/stream/10"
 exec curl -sx "http://localhost:$port" "httpbin.org/response-headers?Etag=123"
+expect {
+    "●" {}
+    timeout {
+        puts "no mark on flows with errors!"
+        exit 1
+    }
+}
 
 puts "running as HTTP/1.1 reverse proxy"
 send ":set mode=reverse:http://httpd.apache.org\r"
