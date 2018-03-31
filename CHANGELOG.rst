@@ -5,19 +5,22 @@ History of changes
 Unreleased
 ~~~~~~~~~~
 - Overhaul for mitmproxy 3.
-- There are no more options ``-w``, ``-o``, ``--tail`` to produce a report.
-  Instead, there are `mitmproxy commands`_ ``httpolice.report.html`` and
-  ``httpolice.report.text``, which take a `filter`_ and a path to write to.
-  See the `manual`_ for hints on how to use them.
-- Flows (exchanges) with notices can now be visually marked
-  in the mitmproxy UI if you set the `mitmproxy option`_ ``httpolice_mark``.
-- Notices to silence are now specified with the option ``httpolice_silence``.
-- Brief reports shown on the “Detail” pane in the console are a bit nicer now.
 
-.. _mitmproxy commands: https://docs.mitmproxy.org/stable/concepts-commands/
-.. _filter: https://docs.mitmproxy.org/stable/concepts-filters/
-.. _manual: http://mitmproxy-httpolice.readthedocs.io/
-.. _mitmproxy option: https://docs.mitmproxy.org/stable/concepts-options/
+- Now focuses on closer integration with mitmproxy’s interactive features:
+
+  - `commands`_ to produce reports on any flows
+  - `options`_ that can be changed on the fly
+  - marks on flows with problems
+  - better display of notices in flow details
+
+- At least for now, the original approach of writing a report
+  non-interactively (options ``-w``, ``--tail``) is not supported.
+  You need the ``mitmproxy`` tool, not ``mitmdump`` or ``mitmweb``.
+
+- See `docs`_ for details.
+
+.. _commands: https://docs.mitmproxy.org/stable/concepts-commands/
+.. _options: https://docs.mitmproxy.org/stable/concepts-options/
 
 
 0.6.1 - 2017-08-02

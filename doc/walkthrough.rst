@@ -3,7 +3,7 @@ Walkthrough
 
 .. highlight:: console
 
-This walkthrough explains how to use mitmproxy-HTTPolice in various scenarios,
+This walkthrough explains how to use mitmproxy-HTTPolice in various cases,
 but it does not explain mitmproxy itself. For best results, familiarize
 yourself with mitmproxy and its `docs`__ first.
 
@@ -36,25 +36,22 @@ __ http://httpolice.readthedocs.io/page/install.html
 Startup
 -------
 
-You need to tell mitmproxy to load the `addon`__ file.
-
-__ https://docs.mitmproxy.org/stable/addons-overview/
-
-For your convenience, after you’ve installed it as per above,
-the following command will print the path to the addon file::
+Get the path to the mitmproxy-HTTPolice `addon`__ file
+with the following command::
 
   $ python3 -m mitmproxy_httpolice
   /home/vasiliy/.local/lib/python3.5/site-packages/mitmproxy_httpolice.py
 
-So, you can tell mitmproxy to load this file with the ``-s`` (``--scripts``)
-option, in a command like this::
+__ https://docs.mitmproxy.org/stable/addons-overview/
 
-  $ mitmproxy -s `python3 -m mitmproxy_httpolice`
+Tell mitmproxy to load this file with the ``-s`` (``--scripts``) option,
+like this (note the backticks)::
+
+  $ mitmproxy -s "`python3 -m mitmproxy_httpolice`"
 
 .. highlight:: yaml
 
-Or, to avoid typing that every time, just put it into your
-``~/.mitmproxy/config.yaml``::
+Or just put it into your ``~/.mitmproxy/config.yaml``::
 
   scripts:
     - /home/vasiliy/.local/lib/python3.5/site-packages/mitmproxy_httpolice.py
@@ -65,9 +62,8 @@ Or, to avoid typing that every time, just put it into your
 Inspecting traffic on the fly
 -----------------------------
 
-When you run mitmproxy as shown above, it checks every flow
-(:ref:`exchange <exchanges>`) with HTTPolice. You can then find any
-resulting notices on the flow’s `Details` pane, under `Metadata`:
+mitmproxy-HTTPolice checks every flow (:ref:`exchange <exchanges>`)
+and prints any results on the flow’s `Details` pane, under `Metadata`:
 
 .. image:: notices-detail.png
 
@@ -80,16 +76,11 @@ Marking flows with problems
 From the flow list, how do you know which flows have any interesting notices
 on them?
 
-HTTPolice can *mark* them for you if you set the `option`__ named
-``httpolice_mark``. Like all mitmproxy options, there are several ways
-to set it:
+HTTPolice can *mark* them for you if you set the `option`__ ``httpolice_mark``.
+There are several ways to set it:
 
 - From inside mitmproxy: with the options editor (by typing ``O``).
   The new value you set there will **only apply to newly captured flows**.
-
-  .. note::
-
-     To unset this option in the editor, type ``d`` on it.
 
 - On the command line::
 
@@ -105,33 +96,22 @@ to set it:
 
 __ https://docs.mitmproxy.org/stable/concepts-options/
 
-So, ``httpolice_mark=comment`` means “mark any flows where HTTPolice has found
+``httpolice_mark=comment`` means “mark any flows where HTTPolice has found
 at least one comment or error”. ``httpolice_mark=error`` limits this to errors.
 
-*Marking flows* is a general concept in mitmproxy. Marked flows have a big fat
-dot next to them in the flows list:
+*Marking flows* is a general concept in mitmproxy. Marked flows have
+a big fat dot next to them in the flow list:
 
 .. image:: marked-flows.png
 
 You can quickly run `commands`__ on “all marked flows”, for instance,
 to save them to a file::
 
-  : save.file @marked ~/marked.flows
+  : save.file @marked /path/to/marked.flows
 
 __ https://docs.mitmproxy.org/stable/concepts-commands/
 
 You can also manually toggle the mark on any flow by typing ``m``.
-
-
-Event log
----------
-
-Whenever HTTPolice finds a problem in a flow, it also prints a message
-to mitmproxy’s event log, which you can inspect by typing ``E``, or, if you
-prefer to see it next to the flow list, by typing ``-`` (dash) to change
-the UI layout.
-
-.. image:: eventlog.png
 
 
 .. _mitmproxy_silence:
@@ -139,38 +119,20 @@ the UI layout.
 Silencing unwanted notices
 --------------------------
 
-Another option you can change is ``httpolice_silence``, which is a list
-of HTTPolice notice IDs that should be :ref:`silenced <silence>`. They will
-disappear from the `Details` pane, they will not cause flows to be marked,
-and so on.
+Witht the ``httpolice_silence`` option, you can tell HTTPolice whice notice IDs
+to :ref:`silenced <silence>`. They will disappear from flow details, and so on.
 
-.. note::
+When editing this option in mitmproxy’s interactive options editor,
+type ``a`` to add a new item, then type the notice ID, then Esc to commit.
+Type ``d`` on an item to delete it. The new value you set
+will apply to newly captured flows and newly produced reports.
 
-   In ``~/.mitmproxy/config.yaml``, notice IDs must be quoted so they are
-   treated as strings, **not** numbers::
+In ``~/.mitmproxy/config.yaml``, notice IDs must be quoted so they are
+treated as strings, **not** numbers::
 
-     httpolice_silence:
-       - "1234"
-       - "1256"
-
-   or::
-
-     httpolice_silence: ["1234", "1256"]
-
-.. note::
-
-   Until `mitmproxy issue #3015`__ is fixed, there’s no way to silence
-   multiple notices on the command line. Use a config file instead,
-   combined with the ``--conf`` option if necessary.
-
-   __ https://github.com/mitmproxy/mitmproxy/issues/3015
-
-.. note::
-
-   When editing this list in mitmproxy’s interactive options editor,
-   type ``a`` to add a new item, then Enter to start editing it,
-   then type the notice ID, then Esc to commit, and finally ``q`` to close.
-   Type ``d`` on an item to delete it.
+  httpolice_silence:
+    - "1234"
+    - "1256"
 
 
 .. _reports:
@@ -181,10 +143,10 @@ Full reports
 If you prefer to see HTTPolice’s full HTML report, you can create one
 with the ``httpolice.report.html`` command. For example::
 
-  : httpolice.report.html @all ~/report.html
+  : httpolice.report.html @all /path/to/report.html
 
 Here, ``@all`` means “all flows”. You can replace it with any of mitmproxy’s
-powerful `filter expressions`__, among them ``@marked`` for flows that have
+`filter expressions`__, among them ``@marked`` for flows that have
 been previously :ref:`marked <marking>` by HTTPolice.
 
 __ https://docs.mitmproxy.org/stable/concepts-filters/
@@ -192,6 +154,8 @@ __ https://docs.mitmproxy.org/stable/concepts-filters/
 There’s also the ``httpolice.report.text`` command if you want the plain
 text report.
 
+
+.. _keybindings:
 
 Keybindings
 -----------
@@ -203,77 +167,74 @@ focused flow in ``~/report.html``::
 
   : console.key.bind flowlist W httpolice.report.html @focus ~/report.html
 
-.. note::
+.. highlight:: python
 
-   .. highlight:: python
+As of this writing, there’s `no easy and well-documented way`__ to make
+keybindings permanent. But it can be achieved with a small script::
 
-   As of this writing, there’s `no easy and well-documented way`__ to make
-   keybindings permanent. If you don’t want to bind them every time you
-   run mitmproxy, you can write a small custom script to do it for you::
- 
-     def load(loader):
-         from mitmproxy import ctx
-         ctx.master.commands.call('console.key.bind flowlist W '
-                                  'httpolice.report.html @focus ~/report.html')
+  def load(loader):
+      from mitmproxy import ctx
+      ctx.master.commands.call('console.key.bind flowlist W '
+                               'httpolice.report.html @focus ~/report.html')
 
-   .. highlight:: console
+.. highlight:: console
 
-   Put it into a file somewhere, and load that file into mitmproxy
-   just as you :ref:`load HTTPolice <startup>` (but **after** HTTPolice,
-   e.g. in the **next** ``-s`` option).
- 
-   __ https://github.com/mitmproxy/mitmproxy/issues/2963
+Put it into a file somewhere, and load that file into mitmproxy
+just as you :ref:`load HTTPolice <startup>` (but **after** HTTPolice,
+e.g. in the **next** item under ``scripts:``).
+
+__ https://github.com/mitmproxy/mitmproxy/issues/2963
 
 
 Example workflow
 ----------------
 
-Here’s an example workflow that can arise from the features explained so far.
+Here’s one workflow that can arise from the features explained so far.
+
 Let’s say you’re a developer (or tester) iterating on a piece of software
-that sends or serves HTTP requests.
+that sends or serves HTTP requests, and you want that software to implement
+the HTTP protocol correctly.
 
-#. Set option ``httpolice_mark`` to ``comment``.
+First, :ref:`set option <marking>` ``httpolice_mark`` to ``comment``,
+and :ref:`set a keybinding <keybindings>` like this::
 
-#. Set a keybinding like this::
+  : console.key.bind flowlist f5 httpolice.report.html @marked report.html
 
-     : console.key.bind flowlist f5 httpolice.report.html @marked report.html
+Then:
 
-#. Do something with your software, capturing some flows into mitmproxy.
+#. Do something with your software, capturing a bunch of flows into mitmproxy.
 
-#. In mitmproxy, type F5. A report on all the problems found by HTTPolice
-   is written to ``report.html`` in the current directory.
+#. In mitmproxy, type F5. HTTPolice writes a report on all the problems
+   found so far to ``report.html`` in the current directory.
 
 #. Open that file (or rather, press F5 in a browser window
    where it’s already open) to read the report.
 
 #. Fix the problems in your software,
-   or :ref:`silence them <mitmproxy_silence>` in HTTPolice
-   by adding them to the ``httpolice_silence`` option.
+   or :ref:`silence them <mitmproxy_silence>` in HTTPolice.
 
 #. Now that you are done with that particular batch of flows,
-   type ``z`` in mitmproxy to clear the flows list.
+   type ``z`` in mitmproxy to clear the flow list.
 
 #. Rinse, repeat.
 
 
-Companion tools to mitmproxy
-----------------------------
+Non-interactive use
+-------------------
 
-``mitmproxy`` is the original tool in a family that now also includes
-``mitmdump`` and ``mitmweb``. Unfortunately, for now, HTTPolice’s integration
-with them is limited.
+mitmproxy-HTTPolice is currently focused on interactive use.
+Of mitmproxy’s three `tools`__, only the original ``mitmproxy`` console UI
+currently supports HTTPolice. ``mitmweb`` lacks the necessary features,
+although it will probably catch up to ``mitmproxy`` eventually.
+``mitmdump`` is aimed at non-interactive use and HTTPolice doesn’t do
+anything useful under it.
 
-You might want to use HTTPolice with ``mitmdump`` if you just want one report
-on all of your traffic, without mitmproxy’s interactive UI. But right now
-there’s no way to avoid ``mitmproxy`` for this (see `issue #3022`__),
-You can run ``mitmdump --save-stream-file``, then run ``mitmproxy --no-server
---rfile`` and :ref:`save a report <reports>` from there,
-but at that point why not ditch ``mitmdump`` entirely.
-You’re probably going to hit practical limits on HTML report size
-well before you have too many flows to fit into mitmproxy’s memory.
+__ https://docs.mitmproxy.org/stable/overview-tools/
 
-__ https://github.com/mitmproxy/mitmproxy/issues/3022
+That said, you can get data from ``mitmdump`` into HTTPolice like this:
 
-As for ``mitmweb``, it may grow into a fully-featured replacement
-for ``mitmproxy`` one day, but right now it doesn’t have commands,
-marked flows, nor metadata display, so there’s nothing HTTPolice can hook into.
+#. Run ``mitmdump`` with the ``--save-stream-file`` option
+   to save flows into a file.
+#. Run ``mitmproxy`` with the ``--no-server`` and ``--rfile`` options
+   to load flows from that file. Of course, you may run it on another system.
+#. Work in ``mitmproxy`` as usual (``: httpolice.report.html @all ...``).

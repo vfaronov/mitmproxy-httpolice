@@ -168,7 +168,7 @@ def mark_exchange(exch, flow):
 
 
 def log_exchange(exch, flow):
-    # Produce lines like "1 errors, 2 warnings" without hardcoding severities.
+    # Produce lines like "1 errors, 2 comments" without hardcoding severities.
     severities = collections.Counter(notice.severity
                                      for msg in [exch.request] + exch.responses
                                      for notice in msg.notices)
