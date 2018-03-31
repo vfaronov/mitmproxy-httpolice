@@ -120,12 +120,16 @@ def attach_report(exch, flow):
     httpolice.text_report([exch], buf)
     report = buf.getvalue().decode('utf-8')
     for_request, for_response = parse_report(report)
-    metadata_entries = [('Request notices', for_request),
-                        ('Response notices', for_response)]
+    metadata_entries = [('HTTPolice: request', for_request),
+                        ('HTTPolice: response', for_response)]
     try:
         for title, lines in metadata_entries:
             if lines:
                 text = u'\n'.join(lines) + u'\n'
+                # When loading previously processed flows from file,
+                # this `title` might already be present there, but
+                # it won't be overwritten because of the `HashHack`.
+                flow.metadata.pop(title, None)
                 flow.metadata[HashHack(title)] = ReprString(text)
     except Exception:
         # `flow.metadata` is not public API, so could theoretically fail.
