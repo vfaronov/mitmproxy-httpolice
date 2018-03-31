@@ -1,6 +1,6 @@
 #!/usr/bin/expect --
 
-# Usage: tools/integration_tests.tcl [-http2]
+# Usage: ./test.tcl [-http2]
 #
 # Run this inside the virtualenv (if you're using one).
 # -http2 requires nghttp on $PATH, as well as a reasonably recent OpenSSL.
@@ -36,6 +36,8 @@ expect ":$port"
 puts "running as HTTP/1.1 forward proxy"
 exec curl -sx "http://localhost:$port" "httpbin.org/stream/10"
 exec curl -sx "http://localhost:$port" "httpbin.org/response-headers?Etag=123"
+
+puts "check flow marking"
 expect {
     "●" {}
     timeout {die "no mark on flows with errors!"}

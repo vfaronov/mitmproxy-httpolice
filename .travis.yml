@@ -34,7 +34,7 @@ script:
 
     # Spin up an actual mitmproxy instance and run a few requests through it.
     # No HTTP/2 here, because trusty doesn't have nghttp.
-    - tools/integration_tests.tcl
+    - ./test.tcl
 
     # Although the docs are processed by Read the Docs,
     # we still want to check that they are building OK.
