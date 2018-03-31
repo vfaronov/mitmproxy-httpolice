@@ -5,6 +5,7 @@ include README.rst
 include LICENSE.txt
 include CHANGELOG.rst
 
+include test.tcl
 include .isort.cfg
 include pylintrc
 
