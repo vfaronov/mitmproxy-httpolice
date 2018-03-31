@@ -70,7 +70,7 @@ class MitmproxyHTTPolice:
 def flow_to_exchange(flow):
     req = construct_request(flow)
     resp = construct_response(flow)
-    exch = httpolice.Exchange(req, [resp])
+    exch = httpolice.Exchange(req, [resp] if resp else [])
     exch.silence([int(id_) for id_ in ctx.options.httpolice_silence])
     httpolice.check_exchange(exch)
     return exch
@@ -98,6 +98,8 @@ def construct_request(flow):
 
 
 def construct_response(flow):
+    if flow.response is None:
+        return None
     version, headers, body = extract_message_basics(flow.response)
     status = flow.response.status_code
     reason = decode(flow.response.reason)

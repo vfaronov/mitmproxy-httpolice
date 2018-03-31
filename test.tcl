@@ -36,6 +36,7 @@ expect ":$port"
 puts "running as HTTP/1.1 forward proxy"
 exec curl -sx "http://localhost:$port" "httpbin.org/stream/10"
 exec curl -sx "http://localhost:$port" "httpbin.org/response-headers?Etag=123"
+exec curl -sx "http://localhost:$port" "test.invalid/"
 
 puts "check flow marking"
 expect {
@@ -96,6 +97,7 @@ exec grep -F "Bad JSON body" "$reportpath.html"
 exec grep -F "E 1038 Bad JSON body" "$reportpath.txt"
 exec grep -F "as part of entity-tag" "$reportpath.html"
 exec grep -F "E 1000 Syntax error in ETag header" "$reportpath.txt"
+exec grep -F "test.invalid" "$reportpath.html"
 exec grep -F "OPTIONS" "$reportpath.html"
 exec grep -F "OPTIONS *" "$reportpath.txt"
 if $with_http2 {
