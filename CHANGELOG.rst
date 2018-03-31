@@ -2,8 +2,8 @@ History of changes
 ==================
 
 
-Unreleased
-~~~~~~~~~~
+0.7.0 - 2018-03-31
+~~~~~~~~~~~~~~~~~~
 - Overhaul for mitmproxy 3.
 
 - Now focuses on closer integration with mitmproxy’s interactive features:
