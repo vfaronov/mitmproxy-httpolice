@@ -1,2 +1,2 @@
-mitmproxy >= 3.0.3
+mitmproxy >= 3.0.3, < 4
 HTTPolice >= 0.5.0
