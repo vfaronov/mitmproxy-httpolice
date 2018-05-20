@@ -2,6 +2,13 @@ History of changes
 ==================
 
 
+0.7.1 - 2018-05-20
+~~~~~~~~~~~~~~~~~~
+This version adds an explicit requirement for mitmproxy version less than 4.
+A new version compatible with mitmproxy 4 and/or higher will be released
+eventually, when time permits.
+
+
 0.7.0 - 2018-03-31
 ~~~~~~~~~~~~~~~~~~
 - Overhaul for mitmproxy 3.
