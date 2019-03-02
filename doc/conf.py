@@ -122,7 +122,7 @@ html_theme = 'alabaster'
 html_theme_options = {
      'extra_nav_links': OrderedDict([
           ('mitmproxy docs', 'https://docs.mitmproxy.org/stable/'),
-          ('HTTPolice user manual', 'http://httpolice.readthedocs.io/'),
+          ('HTTPolice user manual', 'https://httpolice.readthedocs.io/'),
      ]),
 }
 
@@ -345,5 +345,5 @@ texinfo_documents = [
 
 
 intersphinx_mapping = {
-    'httpolice': ('http://httpolice.readthedocs.io/page/', None),
+    'httpolice': ('https://httpolice.readthedocs.io/page/', None),
 }

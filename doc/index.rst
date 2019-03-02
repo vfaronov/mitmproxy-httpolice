@@ -10,7 +10,7 @@ mitmproxy-HTTPolice is an `addon for mitmproxy`__
 that will check intercepted exchanges and produce `HTTPolice`__ reports.
 
 __ https://docs.mitmproxy.org/stable/addons-overview/
-__ http://httpolice.readthedocs.io/
+__ https://httpolice.readthedocs.io/
 
 Contents
 --------

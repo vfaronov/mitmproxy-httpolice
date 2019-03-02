@@ -10,7 +10,7 @@ __ https://mitmproxy.org/
 
 `Read the docs`__.
 
-__ http://mitmproxy-httpolice.readthedocs.io/
+__ https://mitmproxy-httpolice.readthedocs.io/
 
 Many details from the `main repo`__'s ``HACKING.rst`` apply here as well.
 

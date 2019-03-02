@@ -21,7 +21,7 @@ If this is giving you trouble,
 see `mitmproxy docs`__ and `HTTPolice docs`__ for more detailed instructions.
 
 __ https://docs.mitmproxy.org/stable/overview-installation/
-__ http://httpolice.readthedocs.io/page/install.html
+__ https://httpolice.readthedocs.io/page/install.html
 
 .. note::
 
@@ -119,8 +119,8 @@ You can also manually toggle the mark on any flow by typing ``m``.
 Silencing unwanted notices
 --------------------------
 
-Witht the ``httpolice_silence`` option, you can tell HTTPolice whice notice IDs
-to :ref:`silenced <silence>`. They will disappear from flow details, and so on.
+Witht the ``httpolice_silence`` option, you can tell HTTPolice which notice IDs
+to :ref:`silence <silence>`. They will disappear from flow details, and so on.
 
 When editing this option in mitmproxy’s interactive options editor,
 type ``a`` to add a new item, then type the notice ID, then Esc to commit.

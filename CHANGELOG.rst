@@ -54,7 +54,7 @@ Added
 - In the ``mitmproxy`` console UI, you can now see a brief report
   for every individual exchange on its “Detail” pane (see `docs`_).
 
-.. _docs: http://mitmproxy-httpolice.readthedocs.io/
+.. _docs: https://mitmproxy-httpolice.readthedocs.io/
 
 Changed
 -------
