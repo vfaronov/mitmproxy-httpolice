@@ -47,7 +47,7 @@ expect {
 puts "running as HTTP/1.1 reverse proxy"
 send ":set mode=reverse:http://httpd.apache.org\r"
 sleep 1
-exec nc -C localhost $port << "OPTIONS * HTTP/1.1\nHost: localhost:$port\n\n"
+exec nc -Cq0 localhost $port << "OPTIONS * HTTP/1.1\nHost: localhost:$port\n\n"
 
 if $with_http2 {
     puts "running as HTTP/2 reverse proxy"
