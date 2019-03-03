@@ -2,8 +2,8 @@ History of changes
 ==================
 
 
-Unreleased
-~~~~~~~~~~
+0.8.0 - 2019-03-03
+~~~~~~~~~~~~~~~~~~
 This version is for mitmproxy 4.
 
 

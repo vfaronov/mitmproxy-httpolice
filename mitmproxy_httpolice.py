@@ -10,7 +10,7 @@ import mitmproxy.flow
 import mitmproxy.types
 
 
-__version__ = '0.8.0.dev1'
+__version__ = '0.8.0'
 
 
 class MitmproxyHTTPolice:
