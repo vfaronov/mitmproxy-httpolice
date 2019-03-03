@@ -15,7 +15,8 @@ log_user 0
 set timeout 3
 set port 31994
 set scriptpath [exec python -m mitmproxy_httpolice]
-set reportpath "/tmp/httpolice-report"
+set workdir [exec mktemp --directory --tmpdir "XXX.mitmproxy-httpolice-test"]
+set reportpath "$workdir/report"
 set nghttp_features [exec nghttp --help]
 
 proc die {msg} {
@@ -24,7 +25,7 @@ proc die {msg} {
 }
 
 puts "spawning mitmproxy"
-spawn mitmproxy --conf /dev/null --listen-port $port \
+spawn mitmproxy --confdir "$workdir/conf" --listen-port $port \
     --scripts $scriptpath \
     --set httpolice_silence=1277 --set httpolice_mark=error
 expect ":$port"
@@ -105,3 +106,5 @@ exec grep -F "https://h2o.examp1e.net/assets/" "$reportpath.html"
 exec grep -F "GET https://h2o.examp1e.net/assets/" "$reportpath.txt"
 
 puts "all tests OK"
+
+exec rm -rf $workdir

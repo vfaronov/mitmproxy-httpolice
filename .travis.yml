@@ -12,8 +12,6 @@ addons:
 
 matrix:
     include:
-        - python: "3.5"
-          env: REQUIRES=normal
         - python: "3.6"
           env: REQUIRES=normal
         - python: "3.6"

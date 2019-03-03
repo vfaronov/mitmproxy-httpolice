@@ -13,7 +13,7 @@ __ https://docs.mitmproxy.org/stable/
 Installation
 ------------
 
-Do this in a Python 3.5+ environment::
+Do this in a Python 3.6+ environment::
 
   $ pip3 install mitmproxy-HTTPolice
 
@@ -40,7 +40,7 @@ Get the path to the mitmproxy-HTTPolice `addon`__ file
 with the following command::
 
   $ python3 -m mitmproxy_httpolice
-  /home/vasiliy/.local/lib/python3.5/site-packages/mitmproxy_httpolice.py
+  /home/vasiliy/.local/lib/python3.6/site-packages/mitmproxy_httpolice.py
 
 __ https://docs.mitmproxy.org/stable/addons-overview/
 
@@ -54,7 +54,7 @@ like this (note the backticks)::
 Or just put it into your ``~/.mitmproxy/config.yaml``::
 
   scripts:
-    - /home/vasiliy/.local/lib/python3.5/site-packages/mitmproxy_httpolice.py
+    - /home/vasiliy/.local/lib/python3.6/site-packages/mitmproxy_httpolice.py
 
 .. highlight:: console
 
@@ -157,33 +157,20 @@ text report.
 
 .. _keybindings:
 
-Keybindings
------------
+Key bindings
+------------
 
-Because ``httpolice.report.html`` is a normal mitmproxy command, you can bind
-keyboard shortcuts to it. For example, after the following command,
-typing ``W`` (that is, Shift+W) will produce an HTML report on the currently
-focused flow in ``~/report.html``::
+Because ``httpolice.report.html`` is a normal mitmproxy command, you can set
+`key bindings`__ for it. For example, if you put the following into your
+``~/.mitmproxy/keys.yaml``::
 
-  : console.key.bind flowlist W httpolice.report.html @focus ~/report.html
+  - key: W
+    cmd: httpolice.report.html @focus ~/report.html
 
-.. highlight:: python
+then typing ``W`` (that is, Shift+W) will produce an HTML report on the currently
+focused flow in ``~/report.html``.
 
-As of this writing, there’s `no easy and well-documented way`__ to make
-keybindings permanent. But it can be achieved with a small script::
-
-  def load(loader):
-      from mitmproxy import ctx
-      ctx.master.commands.call('console.key.bind flowlist W '
-                               'httpolice.report.html @focus ~/report.html')
-
-.. highlight:: console
-
-Put it into a file somewhere, and load that file into mitmproxy
-just as you :ref:`load HTTPolice <startup>` (but **after** HTTPolice,
-e.g. in the **next** item under ``scripts:``).
-
-__ https://github.com/mitmproxy/mitmproxy/issues/2963
+__ https://docs.mitmproxy.org/stable/tools-mitmproxy/#key-binding-configuration
 
 
 Example workflow
@@ -198,7 +185,8 @@ the HTTP protocol correctly.
 First, :ref:`set option <marking>` ``httpolice_mark`` to ``comment``,
 and :ref:`set a keybinding <keybindings>` like this::
 
-  : console.key.bind flowlist f5 httpolice.report.html @marked report.html
+  - key: f5
+    cmd: httpolice.report.html @marked report.html
 
 Then:
 

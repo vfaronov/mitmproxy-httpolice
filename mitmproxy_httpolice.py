@@ -2,7 +2,6 @@
 
 import collections
 import io
-import os.path
 import typing
 
 import httpolice
@@ -58,8 +57,6 @@ class MitmproxyHTTPolice:
         self.report(flows, httpolice.text_report, path)
 
     def report(self, flows, report_func, path):
-        # https://github.com/mitmproxy/mitmproxy/issues/3002
-        path = os.path.expanduser(path)
         exchanges = (flow_to_exchange(flow) for flow in flows)
         with open(path, 'wb') as f:
             report_func(exchanges, f)

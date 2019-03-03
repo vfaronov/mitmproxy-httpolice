@@ -24,9 +24,9 @@ setup(
     author='Vasiliy Faronov',
     author_email='vfaronov@gmail.com',
     license='MIT',
-    python_requires='>= 3.5',
+    python_requires='>= 3.6',
     install_requires=[
-        'mitmproxy >= 3.0.3, < 4',
+        'mitmproxy >= 4.0.4',
         'HTTPolice >= 0.5.0',
     ],
     py_modules=['mitmproxy_httpolice'],
