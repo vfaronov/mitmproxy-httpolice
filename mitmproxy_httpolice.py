@@ -191,16 +191,14 @@ def log_exchange(exch, flow):
 def decode(s):
     if isinstance(s, bytes):
         return s.decode('iso-8859-1')
-    else:
-        return s
+    return s
 
 
 def ellipsize(s, max_length=40):
-    if len(s) > max_length:
-        ellipsis = '...'
-        return s[:(max_length - len(ellipsis))] + ellipsis
-    else:
+    if len(s) <= max_length:
         return s
+    ellipsis = '...'
+    return s[:(max_length - len(ellipsis))] + ellipsis
 
 
 class HashHack(str):

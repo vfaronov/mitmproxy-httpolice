@@ -1,13 +1,9 @@
 #!/usr/bin/expect --
 
-# Usage: ./test.tcl [-http2]
-#
-# Run this inside the virtualenv (if you're using one).
-# -http2 requires nghttp on $PATH, as well as a reasonably recent OpenSSL.
-#
-# Run this in a separate terminal, or reset your terminal after running,
-# because the stty invocation below doesn't seem to be undone by expect
-# even on a successful exit.
+# Run this inside the virtual environment (if you're using one).
+# Requires nc, curl, and nghttp on $PATH, and a reasonably recent OpenSSL.
+# Caution: Under some circumstances, this script might mess up your terminal,
+# so best to run this in a separate one.
 
 # In Travis builds, urwid under expect thinks it's running in a 0x0 terminal
 # unless I initialize this explicitly.
@@ -16,11 +12,11 @@ stty columns 80 rows 25
 # Don't pass the spawned commands' output to the controlling terminal.
 log_user 0
 
-set with_http2 {[lsearch -exact $argv -http2] >= 0}
 set timeout 3
 set port 31994
 set scriptpath [exec python -m mitmproxy_httpolice]
 set reportpath "/tmp/httpolice-report"
+set nghttp_features [exec nghttp --help]
 
 proc die {msg} {
     puts $msg
@@ -49,12 +45,14 @@ send ":set mode=reverse:http://httpd.apache.org\r"
 sleep 1
 exec nc -Cq0 localhost $port << "OPTIONS * HTTP/1.1\nHost: localhost:$port\n\n"
 
-if $with_http2 {
-    puts "running as HTTP/2 reverse proxy"
-    send ":set mode=reverse:https://h2o.examp1e.net\r"
-    sleep 1
-    exec nghttp -vn "https://localhost:$port/"
+puts "running as HTTP/2 reverse proxy"
+send ":set mode=reverse:https://h2o.examp1e.net\r"
+sleep 1
+set nghttp [list nghttp --verbose --null-out]
+if {[string first "--no-verify-peer" $nghttp_features] > 0} {
+    lappend nghttp --no-verify-peer
 }
+exec {*}$nghttp "https://localhost:$port/"
 
 puts "generating reports"
 send ":httpolice.report.html @all $reportpath.html\r"
@@ -100,12 +98,10 @@ exec grep -F "E 1000 Syntax error in ETag header" "$reportpath.txt"
 exec grep -F "test.invalid" "$reportpath.html"
 exec grep -F "OPTIONS" "$reportpath.html"
 exec grep -F "OPTIONS *" "$reportpath.txt"
-if $with_http2 {
-    exec grep -F "https://h2o.examp1e.net/" "$reportpath.html"
-    exec grep -F "HTTP/2" "$reportpath.html"
-    # promised requests
-    exec grep -F "https://h2o.examp1e.net/assets/" "$reportpath.html"
-    exec grep -F "GET https://h2o.examp1e.net/assets/" "$reportpath.txt"
-}
+exec grep -F "https://h2o.examp1e.net/" "$reportpath.html"
+exec grep -F "HTTP/2" "$reportpath.html"
+# promised requests
+exec grep -F "https://h2o.examp1e.net/assets/" "$reportpath.html"
+exec grep -F "GET https://h2o.examp1e.net/assets/" "$reportpath.txt"
 
 puts "all tests OK"

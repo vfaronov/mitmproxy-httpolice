@@ -1,5 +1,5 @@
 language: python
-dist: trusty
+dist: xenial
 sudo: false
 
 addons:
@@ -8,14 +8,18 @@ addons:
             # Used by integration tests.
             - expect
             - netcat-openbsd
+            - nghttp2-client
 
-python:
-    - "3.5"
-    - "3.6"
-
-env:
-    - REQUIRES=minimum
-    - REQUIRES=normal
+matrix:
+    include:
+        - python: "3.5"
+          env: REQUIRES=normal
+        - python: "3.6"
+          env: REQUIRES=normal
+        - python: "3.6"
+          env: REQUIRES=minimum
+        - python: "3.7"
+          env: REQUIRES=normal
 
 install:
     - if [ "$REQUIRES" = minimum ]; then tools/minimum_requires.sh; fi
@@ -30,10 +34,9 @@ script:
 
     # Basic stuff.
     - python setup.py check --strict --restructuredtext
-    - pylint *.py
+    - pylint --reports=no --score=no *.py
 
     # Spin up an actual mitmproxy instance and run a few requests through it.
-    # No HTTP/2 here, because trusty doesn't have nghttp.
     - ./test.tcl
 
     # Although the docs are processed by Read the Docs,
@@ -51,7 +54,7 @@ deploy:
     on:
         tags: true
         # Only release from one of the environments.
-        python: "3.5"
+        python: "3.6"
         condition: $REQUIRES = normal
     provider: pypi
     user: vfaronov
