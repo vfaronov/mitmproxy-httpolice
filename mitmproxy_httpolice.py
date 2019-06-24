@@ -119,20 +119,20 @@ def attach_report(exch, flow):
     httpolice.text_report([exch], buf)
     report = buf.getvalue().decode('utf-8')
     for_request, for_response = parse_report(report)
-    metadata_entries = [('HTTPolice: request', for_request),
-                        ('HTTPolice: response', for_response)]
-    try:
-        for title, lines in metadata_entries:
-            if lines:
-                text = u'\n'.join(lines) + u'\n'
-                # When loading previously processed flows from file,
-                # this `title` might already be present there, but
-                # it won't be overwritten because of the `HashHack`.
+    for title, lines in [('HTTPolice: request', for_request),
+                         ('HTTPolice: response', for_response)]:
+        if lines:
+            text = u'\n'.join(lines) + u'\n'
+            try:
+                # If this script is being run on a flow previously loaded
+                # from file, `flow.metadata` might already contain our keys
+                # in the wrong order. Reinsert them instead of just updating.
                 flow.metadata.pop(title, None)
-                flow.metadata[HashHack(title)] = ReprString(text)
-    except Exception:
-        # `flow.metadata` is not public API, so could theoretically fail.
-        pass
+                flow.metadata[title] = ReprString(text)
+            except Exception:
+                # `flow.metadata` is not public API,
+                # so could theoretically fail.
+                pass
 
 
 def parse_report(report):
@@ -196,23 +196,6 @@ def ellipsize(s, max_length=40):
         return s
     ellipsis = '...'
     return s[:(max_length - len(ellipsis))] + ellipsis
-
-
-class HashHack(str):
-
-    # Under Python 3.5, keys of `flow.metadata` (which is a plain `dict`)
-    # are iterated over, and hence displayed in the UI, in random order,
-    # depending on the hash seed. This may cause response notices to be shown
-    # before request notices. Work around this with a hack that forces
-    # the desired hash for the string. This may theoretically not work under
-    # some unusual Python implementation, but if it doesn't work, all we get
-    # is a slightly inconvenient UI. The alternative is to lump the entire
-    # report into one metadata entry, which looks ugly for everyone.
-
-    __slots__ = []
-
-    def __hash__(self):
-        return 1 if u'request' in self.lower() else 2
 
 
 class ReprString(str):
