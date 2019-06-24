@@ -212,14 +212,14 @@ def log_exchange(exch, flow):
     severities = collections.Counter(notice.severity
                                      for msg in [exch.request] + exch.responses
                                      for notice in msg.notices)
-    pieces = ['%d %ss' % (n, severity.name)
+    pieces = [f'{n} {severity.name}s'
               for (severity, n) in sorted(severities.items(), reverse=True)
               if severity > httpolice.Severity.debug]
     if pieces:
         log_func = (ctx.log.warn
                     if max(severities) >= httpolice.Severity.error
                     else ctx.log.info)
-        log_func('HTTPolice: %s in: %s %s ← %d' % (
+        log_func('HTTPolice: {0} in: {1} {2} ← {3}'.format(
             ', '.join(pieces),
             flow.request.method, ellipsize(flow.request.path),
             flow.response.status_code,
