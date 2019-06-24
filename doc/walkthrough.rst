@@ -155,6 +155,28 @@ There’s also the ``httpolice.report.text`` command if you want the plain
 text report.
 
 
+.. _inmemory:
+
+In-memory reports
+-----------------
+
+In fact, you don’t have to go through a file to see the report.
+You can put a dash (``-``) in place of the filename::
+
+  : httpolice.report.html @all -
+
+The report will be stored in memory, and you can view it by visiting
+``/+httpolice/`` *via mitmproxy*. If mitmproxy is running on
+``localhost:8080`` in `reverse proxy`__ mode, then just go to
+``http://localhost:8080/+httpolice/`` in your Web browser.
+When in `regular proxy`__ mode, visit something like
+``http://example.com/+httpolice/`` through the proxy
+(the domain doesn’t matter, only the path).
+
+__ https://docs.mitmproxy.org/stable/concepts-modes/#reverse-proxy
+__ https://docs.mitmproxy.org/stable/concepts-modes/#regular-proxy
+
+
 .. _keybindings:
 
 Key bindings
@@ -186,17 +208,17 @@ First, :ref:`set option <marking>` ``httpolice_mark`` to ``comment``,
 and :ref:`set a keybinding <keybindings>` like this::
 
   - key: f5
-    cmd: httpolice.report.html @marked report.html
+    cmd: httpolice.report.html @marked -
 
 Then:
 
 #. Do something with your software, capturing a bunch of flows into mitmproxy.
 
-#. In mitmproxy, type F5. HTTPolice writes a report on all the problems
-   found so far to ``report.html`` in the current directory.
+#. In mitmproxy, type F5. HTTPolice produces a report on all the problems
+   found so far and stores it in memory.
 
-#. Open that file (or rather, press F5 in a browser window
-   where it’s already open) to read the report.
+#. Open (or refresh) ``http://localhost:8080/+httpolice/`` in your Web browser
+   (tweak the URL :ref:`as necessary <inmemory>`) to read the report.
 
 #. Fix the problems in your software,
    or :ref:`silence them <mitmproxy_silence>` in HTTPolice.

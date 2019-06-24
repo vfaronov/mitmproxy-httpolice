@@ -2,6 +2,15 @@ History of changes
 ==================
 
 
+Unreleased
+~~~~~~~~~~
+- You can now view full reports `directly from mitmproxy`_,
+  without saving them to a file first.
+
+.. _directly from mitmproxy:
+   https://mitmproxy-httpolice.readthedocs.io/page/walkthrough.html#inmemory
+
+
 0.8.0 - 2019-03-03
 ~~~~~~~~~~~~~~~~~~
 This version is for mitmproxy 4.

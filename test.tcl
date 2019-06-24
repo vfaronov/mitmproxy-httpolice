@@ -46,6 +46,23 @@ send ":set mode=reverse:http://httpd.apache.org\r"
 sleep 1
 exec nc -Cq0 localhost $port << "OPTIONS * HTTP/1.1\nHost: localhost:$port\n\n"
 
+puts "checking that /+httpolice/ responds with error message"
+exec curl -s "http://localhost:$port/+httpolice/" -o "$reportpath.html"
+exec grep -F "No report has been" "$reportpath.html"
+exec rm -f "$reportpath.html"
+
+puts "generating HTML report in memory"
+send ":httpolice.report.html @all -\r"
+expect {
+    "in memory" {}
+    timeout {die "no acknowledgement alert from command!"}
+}
+
+puts "checking that /+httpolice/ serves the report"
+exec curl -s "http://localhost:$port/+httpolice/" -o "$reportpath.html"
+exec grep -F "Bad JSON body" "$reportpath.html"
+exec rm -f "$reportpath.html"
+
 puts "running as HTTP/2 reverse proxy"
 send ":set mode=reverse:https://h2o.examp1e.net\r"
 sleep 1

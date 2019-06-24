@@ -1,12 +1,16 @@
 # -*- coding: utf-8; -*-
 
 import collections
+import email.utils
+from http import HTTPStatus
 import io
 import typing
 
 import httpolice
 from mitmproxy import ctx
 import mitmproxy.flow
+import mitmproxy.http
+import mitmproxy.net.http
 import mitmproxy.types
 
 
@@ -14,6 +18,9 @@ __version__ = '0.9.0.dev1'
 
 
 class MitmproxyHTTPolice:
+
+    def __init__(self):
+        self.last_report = None
 
     def load(self, loader):
         loader.add_option(
@@ -35,6 +42,10 @@ class MitmproxyHTTPolice:
                 'Mark flows where HTTPolice found notices of this severity '
                 'or higher (empty to disable).'
         )
+
+    def request(self, flow):
+        if flow.request.path == '/+httpolice/':
+            flow.response = self.serve_report()
 
     def response(self, flow):
         exch = flow_to_exchange(flow)
@@ -58,10 +69,40 @@ class MitmproxyHTTPolice:
 
     def report(self, flows, report_func, path):
         exchanges = (flow_to_exchange(flow) for flow in flows)
-        with open(path, 'wb') as f:
-            report_func(exchanges, f)
-        ctx.log.alert(
-            'HTTPolice: wrote report on %d flows to %s' % (len(flows), path))
+        if path == '-':
+            buf = io.BytesIO()
+            report_func(exchanges, buf)
+            self.last_report = buf.getvalue()
+            ctx.log.alert(
+                f'HTTPolice: saved report on {len(flows)} flows in memory')
+        else:
+            with open(path, 'wb') as f:
+                report_func(exchanges, f)
+            ctx.log.alert(
+                f'HTTPolice: wrote report on {len(flows)} flows to {path}')
+
+    def serve_report(self):
+        if self.last_report is None:
+            status_code = HTTPStatus.NOT_FOUND.value
+            content = (
+                f'<!DOCTYPE html><p>No report has been <a href="'
+                f'https://mitmproxy-httpolice.readthedocs.io/en/{__version__}/'
+                f'walkthrough.html#inmemory">produced</a> yet.</p>'
+            ).encode('utf-8')
+        else:
+            status_code = HTTPStatus.OK.value
+            content = self.last_report
+        headers = {
+            'Date': email.utils.formatdate(usegmt=True),
+            'Content-Type': (
+                'text/html; charset=utf-8' if content.startswith(b'<!')
+                else 'text/plain; charset=utf-8'
+            ),
+            'Cache-Control': 'no-store',
+        }
+        return mitmproxy.http.HTTPResponse.wrap(
+            mitmproxy.net.http.Response.make(status_code, content, headers),
+        )
 
 
 def flow_to_exchange(flow):
