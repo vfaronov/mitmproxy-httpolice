@@ -6,7 +6,6 @@ include LICENSE.txt
 include CHANGELOG.rst
 
 include test.tcl
-include .isort.cfg
 include pylintrc
 
 # Even though Travis only works on a Git repo,
