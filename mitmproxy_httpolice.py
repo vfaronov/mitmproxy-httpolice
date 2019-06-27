@@ -1,5 +1,3 @@
-# -*- coding: utf-8; -*-
-
 import collections
 import email.utils
 from http import HTTPStatus
