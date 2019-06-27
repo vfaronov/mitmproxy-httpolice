@@ -119,7 +119,7 @@ You can also manually toggle the mark on any flow by typing ``m``.
 Silencing unwanted notices
 --------------------------
 
-Witht the ``httpolice_silence`` option, you can tell HTTPolice which notice IDs
+With the ``httpolice_silence`` option, you can tell HTTPolice which notice IDs
 to :ref:`silence <silence>`. They will disappear from flow details, and so on.
 
 When editing this option in mitmproxy’s interactive options editor,
