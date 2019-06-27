@@ -2,8 +2,8 @@ History of changes
 ==================
 
 
-Unreleased
-~~~~~~~~~~
+0.9.0 - 2019-06-27
+~~~~~~~~~~~~~~~~~~
 - You can now view full reports `directly from mitmproxy`_,
   without saving them to a file first.
 
